@@ -13,7 +13,7 @@ class GameLogic:
             self.turn = "computer"
 
         self.last_move = []
-        self.status = 2
+        self.status = 0
         self.direct = [
             [0, 1],
             [1, 1],
