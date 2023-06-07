@@ -6,7 +6,6 @@ class Board:
         self.BACKGROUNDCOLOR = (0, 0, 0)
 
         self.startImage = pygame.image.load("img/start.jpg")
-
         self.boardImage = pygame.image.load("img/board.jpg")
         self.boardRect = self.boardImage.get_rect()
         self.blackImage = pygame.image.load("img/black.jpg")
@@ -16,8 +15,8 @@ class Board:
         self.hintImage = pygame.image.load("img/hint.jpg")
         self.hintRect = self.hintImage.get_rect()
 
-        self.computerImage = pygame.image.load("img/" + game.computerTile + "1.jpg")
-        self.computerRect = self.computerImage.get_rect()
+        self.LastMoveImage = pygame.image.load("img/" + game.computerTile + "1.jpg")
+        self.LastMoveRect = self.LastMoveImage.get_rect()
 
         self.board = self.getNewBoard()
         self.resetBoard()
@@ -60,10 +59,13 @@ class Board:
                     elif self.board[x][y] == "white":
                         screen.blit(self.whiteImage, rectDst, self.whiteRect)
 
-            if game.move and self.board[game.move[0]][game.move[1]] == game.computerTile:
-                x, y = game.move[0], game.move[1]
+            if (
+                game.last_move
+                and self.board[game.last_move[0]][game.last_move[1]] == game.computerTile
+            ):
+                x, y = game.last_move[0], game.last_move[1]
                 rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
-                screen.blit(self.computerImage, rectDst, self.computerRect)
+                screen.blit(self.LastMoveImage, rectDst, self.LastMoveRect)
 
             if game.turn == "player":
                 hint = game.getValidMoves(self.board, game.playerTile)
@@ -71,10 +73,11 @@ class Board:
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                     screen.blit(self.hintImage, rectDst, self.hintRect)
         else:
-            result = game.getScore(self.board)
-            if result["black"] > result["white"]:
+            score = game.getScore(self.board)
+            result = "Black  " + str(score["black"]) + "   :   " + str(score["white"]) + "  White"
+            if score["black"] > score["white"]:
                 winner = "black"
-            elif result["black"] < result["white"]:
+            elif score["black"] < score["white"]:
                 winner = "white"
             else:
                 winner = "tie"
@@ -85,6 +88,9 @@ class Board:
                 message = "Computer Win"
             else:
                 message = "Tie"
+
             font = pygame.font.SysFont("Arial", 35)
-            text = font.render(message, True, (255, 255, 255))
-            screen.blit(text, text.get_rect(center=(220, 220)))
+            text1 = font.render(result, True, (255, 255, 255))
+            text2 = font.render(message, True, (255, 255, 255))
+            screen.blit(text1, text1.get_rect(center=(220, 120)))
+            screen.blit(text2, text2.get_rect(center=(220, 200)))

@@ -12,8 +12,8 @@ class GameLogic:
             self.computerTile = "black"
             self.turn = "computer"
 
-        self.move = []
-        self.status = 0
+        self.last_move = []
+        self.status = 2
         self.direct = [
             [0, 1],
             [1, 1],
@@ -116,7 +116,6 @@ class GameLogic:
                 if self.getValidMoves(board, self.computerTile) != []:
                     self.turn = "computer"
                 else:
-                    print("Computer No Move Now")
                     if self.getValidMoves(board, self.playerTile) == []:
                         self.status = 2
 
@@ -128,15 +127,11 @@ class GameLogic:
             pos = agent.choose(board)
             if pos:
                 self.makeMove(board, self.computerTile, pos[0], pos[1])
-                self.move = [pos[0], pos[1]]
+                self.last_move = [pos[0], pos[1]]
                 if self.getValidMoves(board, self.playerTile) != []:
                     self.turn = "player"
-                else:
-                    print("Player No Move Now --2")
             else:
-                print("Computer No Move Now --2")
                 if self.getValidMoves(board, self.playerTile) != []:
                     self.turn = "player"
                 else:
-                    print("shit")
                     self.status = 2
