@@ -49,6 +49,7 @@ class Board:
         screen.fill(self.BACKGROUNDCOLOR)
         if game.status == 0:
             screen.blit(self.startImage, self.boardRect, self.boardRect)
+
         elif game.status == 1:
             screen.blit(self.boardImage, self.boardRect, self.boardRect)
             for x in range(8):
@@ -72,6 +73,7 @@ class Board:
                 for x, y in hint:
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                     screen.blit(self.hintImage, rectDst, self.hintRect)
+
         else:
             score = game.getScore(self.board)
             result = "Black  " + str(score["black"]) + "   :   " + str(score["white"]) + "  White"

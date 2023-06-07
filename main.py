@@ -53,31 +53,43 @@ def main():
     while True:
         if game.status == 0:
             for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == MOUSEBUTTONDOWN:
-                    if player_select and button_start.collidepoint(event.pos):
-                        game = GameLogic(first)
-                        board = Board(game)
-                        agent = Agent(first)
-                        game.status = 1
-                        pygame.time.delay(750)
-
-                    if button_black.collidepoint(event.pos):
-                        player_select = True
-                        first = "player"
-                    elif button_white.collidepoint(event.pos):
-                        player_select = True
-                        first = "computer"
                 """
                 取得滑鼠游標位置
                 """
                 x, y = pygame.mouse.get_pos()
+
+                """
+                判斷滑鼠是否移動到按鈕上
+                """
                 if 315 <= x and x <= 390 and 25 <= y and y <= 75:
                     at_start = True
                 else:
                     at_start = False
+
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == MOUSEBUTTONDOWN:
+                    """
+                    按下start健
+                    """
+                    if player_select and 315 <= x and x <= 390 and 25 <= y and y <= 75:
+                        game = GameLogic(first)
+                        board = Board(game)
+                        agent = Agent(first)
+                        game.status = 1
+                        at_start = False
+                        pygame.time.delay(750)
+
+                    """
+                    選擇黑棋或白棋
+                    """
+                    if 265 <= x and x <= 345 and 80 <= y and y <= 130:
+                        player_select = True
+                        first = "player"
+                    elif 350 <= x and x <= 430 and 80 <= y and y <= 130:
+                        player_select = True
+                        first = "computer"
 
             board.drawBoard(screen, game)
             if game.status == 0:
@@ -116,19 +128,14 @@ def main():
 
         else:
             for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == MOUSEBUTTONDOWN:
-                    if button_restart.collidepoint(event.pos):
-                        game.status = 0
-                    elif button_quit.collidepoint(event.pos):
-                        pygame.quit()
-                        sys.exit()
                 """
                 取得滑鼠游標位置
                 """
                 x, y = pygame.mouse.get_pos()
+
+                """
+                判斷滑鼠是否移動到按鈕上
+                """
                 if 90 <= x and x <= 170 and 280 <= y and y <= 320:
                     at_restart = True
                 else:
@@ -137,6 +144,21 @@ def main():
                     at_quit = True
                 else:
                     at_quit = False
+
+                """
+                判斷按下Restart、Quit或關閉視窗
+                """
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == MOUSEBUTTONDOWN:
+                    if 90 <= x and x <= 170 and 280 <= y and y <= 320:
+                        game.status = 0
+                        at_quit = False
+                        at_restart = False
+                    elif 270 <= x and x <= 350 and 280 <= y and y <= 320:
+                        pygame.quit()
+                        sys.exit()
 
             board.drawBoard(screen, game)
             if at_restart:
