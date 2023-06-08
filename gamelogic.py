@@ -13,7 +13,7 @@ class GameLogic:
         # - last_move: the last move of the computer
         # - status: the status of the game
         # - direct: the 8 directions
-        ########################################################`
+        ########################################################
         if player_first:
             self.playerSide = "black"
             self.computerSide = "white"
@@ -57,6 +57,8 @@ class GameLogic:
                     temp.append([x, y])
                     x += xdirect
                     y += ydirect
+                if not self.isOnBoard(x, y):
+                    break
                 if board[x][y] == side:
                     flipped_disks+=temp
                     break
@@ -166,7 +168,7 @@ class GameLogic:
         #######################################################
         if self.noMoreMove(board):
             self.status = 2
-        pos = agent.choose(board)
+        pos = agent.greedy_choose(board)
         if pos:
             self.flip(board, self.computerSide, pos[0], pos[1])
             self.last_move = [pos[0], pos[1]]

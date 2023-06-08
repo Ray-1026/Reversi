@@ -4,12 +4,15 @@ from gamelogic import GameLogic
 
 class Agent:
     def __init__(self, player_first):
+        ########################################################
+        # - player_first: whether player move first
+        ########################################################
         self.game = GameLogic(player_first)
 
     def getBoardCopy(self, board):
-        """
-        複製棋盤
-        """
+        ########################################################
+        # - board: the status of the tiles in the current board
+        ########################################################
         copied = []
         for i in range(8):
             copied.append(["none"] * 8)
@@ -19,14 +22,17 @@ class Agent:
         return copied
 
     def isOnCorner(self, x, y):
-        """
-        判斷x, y是否在角落
-        """
+        ########################################################
+        # - x: x location of the tile
+        # - y: y location of the tile
+        #------------------------------------------------------
+        # - return whether the tile is on corner
+        #######################################################
         return (
             (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7)
         )
 
-    def choose(self, board):
+    def greedy_choose(self, board):
         """
         用最白癡的greedy選擇最佳的走法
         """
