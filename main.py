@@ -31,7 +31,6 @@ def main():
     button_white = text_white.get_rect(center=(390, 100))
     button_restart = text_restart.get_rect(center=(130, 300))
     button_quit = text_quit.get_rect(center=(310, 300))
-    #player_select = False
     at_start = False
     at_restart = False
     at_quit = False
@@ -76,10 +75,10 @@ def main():
                     if 315 <= x and x <= 390 and 25 <= y and y <= 75:
                     
                         game = GameLogic(player_first)
+                        board = Board(game)
                         agent = Agent(player_first)
                         game.status = 1
                         
-                        board = Board(game)
                         at_start = False
                         pygame.time.delay(750)
                     """

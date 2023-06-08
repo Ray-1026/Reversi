@@ -15,7 +15,7 @@ class Board:
         self.hintImage = pygame.image.load("img/hint.jpg")
         self.hintRect = self.hintImage.get_rect()
 
-        self.LastMoveImage = pygame.image.load("img/" + game.computerTile + "1.jpg")
+        self.LastMoveImage = pygame.image.load("img/" + game.computerSide + "1.jpg")
         self.LastMoveRect = self.LastMoveImage.get_rect()
 
         self.board = self.getNewBoard()
@@ -62,14 +62,14 @@ class Board:
 
             if (
                 game.last_move
-                and self.board[game.last_move[0]][game.last_move[1]] == game.computerTile
+                and self.board[game.last_move[0]][game.last_move[1]] == game.computerSide
             ):
                 x, y = game.last_move[0], game.last_move[1]
                 rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                 screen.blit(self.LastMoveImage, rectDst, self.LastMoveRect)
 
             if game.turn == "player":
-                hint = game.getValidMoves(self.board, game.playerTile)
+                hint = game.getValidMoves(self.board, game.playerSide)
                 for x, y in hint:
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                     screen.blit(self.hintImage, rectDst, self.hintRect)
@@ -84,9 +84,9 @@ class Board:
             else:
                 winner = "tie"
 
-            if winner == game.playerTile:
+            if winner == game.playerSide:
                 message = "Player Win"
-            elif winner == game.computerTile:
+            elif winner == game.computerSide:
                 message = "Computer Win"
             else:
                 message = "Tie"

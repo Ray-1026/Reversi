@@ -30,7 +30,7 @@ class Agent:
         """
         用最白癡的greedy選擇最佳的走法
         """
-        possible = self.game.getValidMoves(board, self.game.computerTile)
+        possible = self.game.getValidMoves(board, self.game.computerSide)
         random.shuffle(possible)
 
         bestScore = -1
@@ -39,8 +39,8 @@ class Agent:
             if self.isOnCorner(x, y):
                 return [x, y]
             copyBoard = self.getBoardCopy(board)
-            self.game.makeMove(copyBoard, self.game.computerTile, x, y)
-            score = self.game.getScore(copyBoard)[self.game.computerTile]
+            self.game.flip(copyBoard, self.game.computerSide, x, y)
+            score = self.game.getScore(copyBoard)[self.game.computerSide]
             if score > bestScore:
                 bestMove = [x, y]
                 bestScore = score
