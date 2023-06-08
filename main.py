@@ -2,7 +2,7 @@ import sys
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from gamelogic import GameLogic, pygame
 from board import Board
-from agent import Agent
+from minimax_agent import Agent
 
 
 def main():
