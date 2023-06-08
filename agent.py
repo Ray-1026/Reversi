@@ -33,9 +33,12 @@ class Agent:
         )
 
     def greedy_choose(self, board):
-        """
-        用最白癡的greedy選擇最佳的走法
-        """
+        ########################################################
+        # - board: the status of the tiles in the current board
+        #------------------------------------------------------
+        # - return false if no possible move left, otherwise
+        # - return the best move with greedy algorithm
+        #######################################################
         possible = self.game.getValidMoves(board, self.game.computerSide)
         random.shuffle(possible)
 
