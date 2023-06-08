@@ -11,10 +11,10 @@ def main():
     """
     pygame.init()
     main_clock = pygame.time.Clock()
-    _first = "player"
-    game = GameLogic(first)
+    player_first = True
+    game = GameLogic(player_first)
     board = Board(game)
-    agent = Agent(first)
+    agent = Agent(player_first)
 
     """
     文字、按鈕設定
@@ -74,9 +74,9 @@ def main():
                     按下start健
                     """
                     if 315 <= x and x <= 390 and 25 <= y and y <= 75:
-                        game = GameLogic(first)
+                        game = GameLogic(player_first)
                         board = Board(game)
-                        agent = Agent(first)
+                        agent = Agent(player_first)
                         game.status = 1
                         at_start = False
                         pygame.time.delay(750)
@@ -85,9 +85,9 @@ def main():
                     選擇黑棋或白棋
                     """
                     if 265 <= x and x <= 345 and 80 <= y and y <= 130:
-                        first = "player"
+                        player_first = True
                     elif 350 <= x and x <= 430 and 80 <= y and y <= 130:
-                        first = "computer"
+                        player_first = False
 
             board.drawBoard(screen, game)
             if game.status == 0:
@@ -95,11 +95,11 @@ def main():
                     pygame.draw.rect(screen, (255, 0, 0), (315, 25, 75, 50), 0)
                 else:
                     pygame.draw.rect(screen, (255, 0, 0), (315, 25, 75, 50), 2)
-                if first == "player":
+                if player_first:
                     pygame.draw.rect(screen, (0, 255, 0), (315 - 50, 30 + 50, 80, 50), 2)
                     pygame.draw.rect(screen, (255, 0, 0), (315 + 35, 30 + 50, 80, 50), 2)
                     # screen.blit(nigga, (270, 130))
-                elif first == "computer":
+                else:
                     pygame.draw.rect(screen, (255, 0, 0), (315 - 50, 30 + 50, 80, 50), 2)
                     pygame.draw.rect(screen, (0, 255, 0), (315 + 35, 30 + 50, 80, 50), 2)
                     # screen.blit(cop, (270, 130))

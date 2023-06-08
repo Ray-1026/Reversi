@@ -3,8 +3,8 @@ from gamelogic import GameLogic
 
 
 class Agent:
-    def __init__(self, first):
-        self.game = GameLogic(first)
+    def __init__(self, player_first):
+        self.game = GameLogic(player_first)
 
     def getBoardCopy(self, board):
         """

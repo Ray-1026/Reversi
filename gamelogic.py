@@ -2,8 +2,8 @@ import pygame
 
 
 class GameLogic:
-    def __init__(self, first):
-        if first == "player":
+    def __init__(self, player_first):
+        if player_first:
             self.playerTile = "black"
             self.computerTile = "white"
             self.turn = "player"
