@@ -4,6 +4,7 @@ import pygame
 class GameLogic:
     #宣告
     def __init__(self, player_first):
+
         if player_first:
             #玩家拿黑棋，電腦拿白棋，玩家先下
             self.playerTile = "black"
@@ -30,12 +31,15 @@ class GameLogic:
             [-1, 1],
         ]
 
-    def isValidMove(self, board, tile, xstart, ystart):
-        """
-        判斷這一步是否合法，並回傳要被翻轉的棋子
-        """
-        if not self.isOnBoard(xstart, ystart) or board[xstart][ystart] != "none":
-            return False
+    
+    def getFlipTiles(self, board, tile, xstart, ystart):
+        '''
+        board: 
+        tile: 目前旗子顏色
+        xstart: X座標
+        ystart: Y座標
+        return flip:list= 
+        '''
         board[xstart][ystart] = tile
         otherTile = "white"
         if tile == "white":
@@ -63,9 +67,18 @@ class GameLogic:
                             break
                         flip.append([x, y])
         board[xstart][ystart] = "none"
-        if len(flip) == 0:
-            return False
         return flip
+
+    def isValidMove(self, board, tile, xstart, ystart):
+        """
+        判斷這一步是否合法，並回傳要被翻轉的棋子
+        """
+        if not self.isOnBoard(xstart, ystart) or board[xstart][ystart] != "none":
+            return False
+        if len(self.getFlipTiles(board, tile, xstart, ystart))==0:
+            return False
+        return True
+        
 
     def isOnBoard(self, x, y):
         """
@@ -102,8 +115,9 @@ class GameLogic:
         """
         下棋
         """
-        flip = self.isValidMove(board, tile, xstart, ystart)
-        if flip == False:
+        if self.isValidMove(board, tile, xstart, ystart):
+            flip = self.getFlipTiles(board, tile, xstart, ystart)
+        else:
             return False
         board[xstart][ystart] = tile
         for x, y in flip:
@@ -117,7 +131,8 @@ class GameLogic:
         if self.status == 1 and self.turn == "player":
             x, y = pygame.mouse.get_pos()
             col, row = int((x - 20) / 50), int((y - 20) / 50)
-            if self.makeMove(board, self.playerTile, col, row) == True:
+            if self.isValidMove(board, self.playerTile, col, row):
+                self.makeMove(board, self.playerTile, col, row)
                 if self.getValidMoves(board, self.computerTile) != []:
                     self.turn = "computer"
                 else:

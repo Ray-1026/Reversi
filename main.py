@@ -36,10 +36,10 @@ def main():
     at_restart = False
     at_quit = False
 
-    cop = pygame.image.load("img/white_cop_with_gun-removebg-preview.png")
-    nigga = pygame.image.load("img/nigga-removebg-preview.png")
-    nigga = pygame.transform.scale(nigga, (90, 94))
-    cop = pygame.transform.scale(cop, (90, 94))
+    # cop = pygame.image.load("img/white_cop_with_gun-removebg-preview.png")
+    # nigga = pygame.image.load("img/nigga-removebg-preview.png")
+    # nigga = pygame.transform.scale(nigga, (90, 94))
+    # cop = pygame.transform.scale(cop, (90, 94))
 
     """
     視窗大小、名稱設定
@@ -99,11 +99,11 @@ def main():
                 if player_first:
                     pygame.draw.rect(screen, (0, 255, 0), (315 - 50, 30 + 50, 80, 50), 2)
                     pygame.draw.rect(screen, (255, 0, 0), (315 + 35, 30 + 50, 80, 50), 2)
-                    screen.blit(nigga, (270, 130))
+                    # screen.blit(nigga, (270, 130))
                 else:
                     pygame.draw.rect(screen, (255, 0, 0), (315 - 50, 30 + 50, 80, 50), 2)
                     pygame.draw.rect(screen, (0, 255, 0), (315 + 35, 30 + 50, 80, 50), 2)
-                    screen.blit(cop, (270, 130))
+                    # screen.blit(cop, (270, 130))
                 screen.blit(text_start, button_start)
                 screen.blit(text_black, button_black)
                 screen.blit(text_white, button_white)
@@ -116,7 +116,7 @@ def main():
                         sys.exit()
                 pygame.time.delay(500)
                 game.ComputerTurn(board.board, agent)
-            else:
+            elif game.turn == "player":
                 for event in pygame.event.get():
                     if event.type == QUIT:
                         pygame.quit()
