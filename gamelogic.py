@@ -2,18 +2,23 @@ import pygame
 
 
 class GameLogic:
+    #宣告
     def __init__(self, player_first):
         if player_first:
+            #玩家拿黑棋，電腦拿白棋，玩家先下
             self.playerTile = "black"
             self.computerTile = "white"
             self.turn = "player"
         else:
+            #玩家拿白棋，電腦拿黑棋，電腦先下
             self.playerTile = "white"
             self.computerTile = "black"
             self.turn = "computer"
-
+        # 上一步下的位置(x, y)
         self.last_move = []
+        # 遊戲顯示初始畫面
         self.status = 0
+        # 9個方位
         self.direct = [
             [0, 1],
             [1, 1],
