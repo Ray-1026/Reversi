@@ -2,16 +2,26 @@ import pygame
 
 
 class GameLogic:
-    def __init__(self, first):
-        if first == "player":
-            self.playerTile = "black"
-            self.computerTile = "white"
+    #宣告
+    def __init__(self, player_first):
+        ########################################################
+        # - player_first: whether player move first
+        #------------------------------------------------------
+        # - playerSide: the side of the player's disk
+        # - computerSide:  the side of the player's disk
+        # - turn: who's turn to play
+        # - last_move: the last move of the computer
+        # - status: the status of the game
+        # - direct: the 8 directions
+        ########################################################
+        if player_first:
+            self.playerSide = "black"
+            self.computerSide = "white"
             self.turn = "player"
         else:
-            self.playerTile = "white"
-            self.computerTile = "black"
+            self.playerSide = "white"
+            self.computerSide = "black"
             self.turn = "computer"
-
         self.last_move = []
         self.status = 0
         self.direct = [
@@ -25,64 +35,80 @@ class GameLogic:
             [-1, 1],
         ]
 
-    def isValidMove(self, board, tile, xstart, ystart):
-        """
-        判斷這一步是否合法，並回傳要被翻轉的棋子
-        """
-        if not self.isOnBoard(xstart, ystart) or board[xstart][ystart] != "none":
-            return False
-        board[xstart][ystart] = tile
-        otherTile = "white"
-        if tile == "white":
-            otherTile = "black"
-        flip = []
+    def getFlipDisks(self, board, side, xstart, ystart):
+        ########################################################
+        # - board: the status of the tiles in the current board
+        # - side: the side of the placed disk
+        # - xstart: x location of the the placed disk
+        # - ystart: y location of the the placed disk
+        #------------------------------------------------------
+        # - return the list of disks that should be flipped
+        #######################################################
+        board[xstart][ystart] = side
+        otherside = "white"
+        if side == "white":
+            otherside = "black"
+        flipped_disks = []
         for xdirect, ydirect in self.direct:
             x, y = xstart + xdirect, ystart + ydirect
-            if self.isOnBoard(x, y) and board[x][y] == otherTile:
-                x += xdirect
-                y += ydirect
-                if not self.isOnBoard(x, y):
-                    continue
-                while board[x][y] == otherTile:
+            temp = []
+            while self.isOnBoard(x, y) and board[x][y]!="none":
+                if board[x][y] == otherside:
+                    temp.append([x, y])
                     x += xdirect
                     y += ydirect
-                    if not self.isOnBoard(x, y):
-                        break
                 if not self.isOnBoard(x, y):
-                    continue
-                if board[x][y] == tile:
-                    while True:
-                        x -= xdirect
-                        y -= ydirect
-                        if x == xstart and y == ystart:
-                            break
-                        flip.append([x, y])
+                    break
+                if board[x][y] == side:
+                    flipped_disks+=temp
+                    break
         board[xstart][ystart] = "none"
-        if len(flip) == 0:
+        return flipped_disks
+
+    def isValidMove(self, board, side, xstart, ystart):
+        #######################################################
+        # - board: the status of the tiles in the current board
+        # - side: the side of the placed disk
+        # - xstart: x location of the placed disk
+        # - ystart: y location of the placed disk
+        #------------------------------------------------------
+        # - return whether the move is valid
+        #######################################################
+        if (not self.isOnBoard(xstart, ystart) 
+        or board[xstart][ystart] != "none" 
+        or len(self.getFlipDisks(board, side, xstart, ystart))==0):
             return False
-        return flip
+        return True 
 
     def isOnBoard(self, x, y):
-        """
-        是否在棋盤的範圍內
-        """
+        ########################################################
+        # - x: x location of the tile
+        # - y: y location of the tile
+        #------------------------------------------------------
+        # - return whether the tile is on board
+        #######################################################
         return 7 >= x and x >= 0 and 7 >= y and y >= 0
 
-    def getValidMoves(self, board, tile):
-        """
-        取得可以下的位置
-        """
+    def getValidMoves(self, board, side):
+        #######################################################
+        # - board: the status of the tiles in the current board
+        # - side: the side of the placed disk
+        #------------------------------------------------------
+        # - return the list of valid moves
+        #######################################################
         valid = []
         for x in range(8):
             for y in range(8):
-                if self.isValidMove(board, tile, x, y) != False:
+                if self.isValidMove(board, side, x, y):
                     valid.append([x, y])
         return valid
 
     def getScore(self, board):
-        """
-        計算目前黑白各子的數量
-        """
+        #######################################################
+        # - board: the status of the tiles in the current board
+        #------------------------------------------------------
+        # - return the scores of two sides
+        #######################################################
         bscore = 0
         wscore = 0
         for x in range(8):
@@ -93,45 +119,56 @@ class GameLogic:
                     wscore += 1
         return {"black": bscore, "white": wscore}
 
-    def makeMove(self, board, tile, xstart, ystart):
-        """
-        下棋
-        """
-        flip = self.isValidMove(board, tile, xstart, ystart)
-        if flip == False:
-            return False
-        board[xstart][ystart] = tile
-        for x, y in flip:
-            board[x][y] = tile
-        return True
+    def flip(self, board, side, xstart, ystart):
+        #######################################################
+        # - board: the status of the tiles in the current board
+        # - side: the side of the placed disk
+        # - xstart: x location of the the placed disk
+        # - ystart: y location of the the placed disk
+        #------------------------------------------------------
+        # - return nothing and flip the disks on move
+        #######################################################
+        disks = self.getFlipDisks(board, side, xstart, ystart)
+        board[xstart][ystart] = side
+        for x, y in disks:
+            board[x][y] = side
+
+    def noMoreMove(self, board):
+        #######################################################
+        # - board: the status of the tiles in the current board
+        #------------------------------------------------------
+        # - return whether there is no more move  
+        #######################################################
+        return (not self.getValidMoves(board, self.playerSide) 
+            and not self.getValidMoves(board, self.computerSide))
 
     def PlayerTurn(self, board):
-        """
-        玩家回合
-        """
-        if self.status == 1 and self.turn == "player":
-            x, y = pygame.mouse.get_pos()
-            col, row = int((x - 20) / 50), int((y - 20) / 50)
-            if self.makeMove(board, self.playerTile, col, row) == True:
-                if self.getValidMoves(board, self.computerTile) != []:
-                    self.turn = "computer"
-                else:
-                    if self.getValidMoves(board, self.playerTile) == []:
-                        self.status = 2
+        #######################################################
+        # - board: the status of the tiles in the current board
+        #------------------------------------------------------
+        # - player chooses the position with mouse
+        #######################################################
+        if self.noMoreMove(board):
+            self.status = 2
+        x, y = pygame.mouse.get_pos()
+        col, row = int((x - 20) / 50), int((y - 20) / 50)
+        if self.isValidMove(board, self.playerSide, col, row):
+            self.flip(board, self.playerSide, col, row)
+            if self.getValidMoves(board, self.computerSide):
+                self.turn = "computer" 
 
     def ComputerTurn(self, board, agent):
-        """
-        電腦回合
-        """
-        if self.status == 1 and self.turn == "computer":
-            pos = agent.choose(board)
-            if pos:
-                self.makeMove(board, self.computerTile, pos[0], pos[1])
-                self.last_move = [pos[0], pos[1]]
-                if self.getValidMoves(board, self.playerTile) != []:
-                    self.turn = "player"
-            else:
-                if self.getValidMoves(board, self.playerTile) != []:
-                    self.turn = "player"
-                else:
-                    self.status = 2
+        #######################################################
+        # - board: the status of the tiles in the current board
+        #------------------------------------------------------
+        # - cmoputer chooses the position with algorithm
+        #######################################################
+        if self.noMoreMove(board):
+            self.status = 2
+        pos = agent.choose(board)
+        if pos:
+            self.flip(board, self.computerSide, pos[0], pos[1])
+            self.last_move = [pos[0], pos[1]]
+        if self.getValidMoves(board, self.playerSide):
+            self.turn = "player"
+

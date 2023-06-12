@@ -11,10 +11,10 @@ def main():
     """
     pygame.init()
     main_clock = pygame.time.Clock()
-    first = "player"
-    game = GameLogic(first)
+    player_first = True
+    game = GameLogic(player_first)
     board = Board(game)
-    agent = Agent(first)
+    agent = Agent(player_first)
 
     """
     文字、按鈕設定
@@ -31,7 +31,6 @@ def main():
     button_white = text_white.get_rect(center=(390, 100))
     button_restart = text_restart.get_rect(center=(130, 300))
     button_quit = text_quit.get_rect(center=(310, 300))
-    player_select = False
     at_start = False
     at_restart = False
     at_quit = False
@@ -51,33 +50,43 @@ def main():
     遊戲畫面更新和遊戲主要邏輯的運作
     """
     while True:
+        
+        # 遊戲開始
         if game.status == 0:
             for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == MOUSEBUTTONDOWN:
-                    if player_select and button_start.collidepoint(event.pos):
-                        game = GameLogic(first)
-                        board = Board(game)
-                        agent = Agent(first)
-                        game.status = 1
-                        pygame.time.delay(750)
 
-                    if button_black.collidepoint(event.pos):
-                        player_select = True
-                        first = "player"
-                    elif button_white.collidepoint(event.pos):
-                        player_select = True
-                        first = "computer"
-                """
-                取得滑鼠游標位置
-                """
+                # 取得滑鼠游標位置
                 x, y = pygame.mouse.get_pos()
+
+                # 判斷滑鼠是否移動到按鈕上
                 if 315 <= x and x <= 390 and 25 <= y and y <= 75:
                     at_start = True
                 else:
                     at_start = False
+
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == MOUSEBUTTONDOWN:
+                    """
+                    按下start健
+                    """
+                    if 315 <= x and x <= 390 and 25 <= y and y <= 75:
+                    
+                        game = GameLogic(player_first)
+                        board = Board(game)
+                        agent = Agent(player_first)
+                        game.status = 1
+                        
+                        at_start = False
+                        pygame.time.delay(750)
+                    """
+                    選擇黑棋或白棋
+                    """
+                    if 265 <= x and x <= 345 and 80 <= y and y <= 130:
+                        player_first = True
+                    elif 350 <= x and x <= 430 and 80 <= y and y <= 130:
+                        player_first = False
 
             board.drawBoard(screen, game)
             if game.status == 0:
@@ -85,18 +94,19 @@ def main():
                     pygame.draw.rect(screen, (255, 0, 0), (315, 25, 75, 50), 0)
                 else:
                     pygame.draw.rect(screen, (255, 0, 0), (315, 25, 75, 50), 2)
-                if first == "player":
+                if player_first:
                     pygame.draw.rect(screen, (0, 255, 0), (315 - 50, 30 + 50, 80, 50), 2)
                     pygame.draw.rect(screen, (255, 0, 0), (315 + 35, 30 + 50, 80, 50), 2)
                     # screen.blit(nigga, (270, 130))
-                elif first == "computer":
+                else:
                     pygame.draw.rect(screen, (255, 0, 0), (315 - 50, 30 + 50, 80, 50), 2)
                     pygame.draw.rect(screen, (0, 255, 0), (315 + 35, 30 + 50, 80, 50), 2)
                     # screen.blit(cop, (270, 130))
                 screen.blit(text_start, button_start)
                 screen.blit(text_black, button_black)
                 screen.blit(text_white, button_white)
-
+        
+        # 遊戲進行
         elif game.status == 1:
             if game.turn == "computer":
                 for event in pygame.event.get():
@@ -105,7 +115,7 @@ def main():
                         sys.exit()
                 pygame.time.delay(500)
                 game.ComputerTurn(board.board, agent)
-            else:
+            elif game.turn == "player":
                 for event in pygame.event.get():
                     if event.type == QUIT:
                         pygame.quit()
@@ -113,22 +123,13 @@ def main():
                     elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                         game.PlayerTurn(board.board)
             board.drawBoard(screen, game)
-
-        else:
+        
+        # 遊戲結束
+        elif game.status==2:
             for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == MOUSEBUTTONDOWN:
-                    if button_restart.collidepoint(event.pos):
-                        game.status = 0
-                    elif button_quit.collidepoint(event.pos):
-                        pygame.quit()
-                        sys.exit()
-                """
-                取得滑鼠游標位置
-                """
+                # 取得滑鼠游標位置
                 x, y = pygame.mouse.get_pos()
+                # 判斷滑鼠是否移動到按鈕上
                 if 90 <= x and x <= 170 and 280 <= y and y <= 320:
                     at_restart = True
                 else:
@@ -137,6 +138,19 @@ def main():
                     at_quit = True
                 else:
                     at_quit = False
+
+                # 判斷按下Restart、Quit或關閉視窗
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == MOUSEBUTTONDOWN:
+                    if 90 <= x and x <= 170 and 280 <= y and y <= 320:
+                        game.status = 0
+                        at_quit = False
+                        at_restart = False
+                    elif 270 <= x and x <= 350 and 280 <= y and y <= 320:
+                        pygame.quit()
+                        sys.exit()
 
             board.drawBoard(screen, game)
             if at_restart:
