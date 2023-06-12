@@ -44,7 +44,7 @@ class Agent:
             ((x == 0 ) or (y == 7) or (x == 7) or (y == 0))
         )
     
-    def greedy_choose(self, board):
+    def choose(self, board):
         ########################################################
         # - board: the status of the tiles in the current board
         #------------------------------------------------------

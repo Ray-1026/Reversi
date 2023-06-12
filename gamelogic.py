@@ -165,7 +165,7 @@ class GameLogic:
         #######################################################
         if self.noMoreMove(board):
             self.status = 2
-        pos = agent.greedy_choose(board)
+        pos = agent.choose(board)
         if pos:
             self.flip(board, self.computerSide, pos[0], pos[1])
             self.last_move = [pos[0], pos[1]]
