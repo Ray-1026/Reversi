@@ -74,8 +74,9 @@ class GameLogic:
         #------------------------------------------------------
         # - return whether the move is valid
         #######################################################
-        if (not self.isOnBoard(xstart, ystart) or board[xstart][ystart] != "none" 
-            or len(self.getFlipDisks(board, side, xstart, ystart))==0):
+        if (not self.isOnBoard(xstart, ystart) 
+        or board[xstart][ystart] != "none" 
+        or len(self.getFlipDisks(board, side, xstart, ystart))==0):
             return False
         return True 
 
@@ -141,7 +142,6 @@ class GameLogic:
         return (not self.getValidMoves(board, self.playerSide) 
             and not self.getValidMoves(board, self.computerSide))
 
-
     def PlayerTurn(self, board):
         #######################################################
         # - board: the status of the tiles in the current board
@@ -155,10 +155,7 @@ class GameLogic:
         if self.isValidMove(board, self.playerSide, col, row):
             self.flip(board, self.playerSide, col, row)
             if self.getValidMoves(board, self.computerSide):
-                self.turn = "computer"
-
-        
-            
+                self.turn = "computer" 
 
     def ComputerTurn(self, board, agent):
         #######################################################

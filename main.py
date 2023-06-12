@@ -50,9 +50,8 @@ def main():
     遊戲畫面更新和遊戲主要邏輯的運作
     """
     while True:
-        '''
-        遊戲初始畫面
-        '''
+        
+        # 遊戲開始
         if game.status == 0:
             for event in pygame.event.get():
 
@@ -106,6 +105,7 @@ def main():
                 screen.blit(text_start, button_start)
                 screen.blit(text_black, button_black)
                 screen.blit(text_white, button_white)
+        
         # 遊戲進行
         elif game.status == 1:
             if game.turn == "computer":
@@ -123,17 +123,13 @@ def main():
                     elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                         game.PlayerTurn(board.board)
             board.drawBoard(screen, game)
+        
         # 遊戲結束
         elif game.status==2:
             for event in pygame.event.get():
-                """
-                取得滑鼠游標位置
-                """
+                # 取得滑鼠游標位置
                 x, y = pygame.mouse.get_pos()
-
-                """
-                判斷滑鼠是否移動到按鈕上
-                """
+                # 判斷滑鼠是否移動到按鈕上
                 if 90 <= x and x <= 170 and 280 <= y and y <= 320:
                     at_restart = True
                 else:
@@ -143,9 +139,7 @@ def main():
                 else:
                     at_quit = False
 
-                """
-                判斷按下Restart、Quit或關閉視窗
-                """
+                # 判斷按下Restart、Quit或關閉視窗
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()

@@ -29,9 +29,21 @@ class Agent:
         # - return whether the tile is on corner
         #######################################################
         return (
-            (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7)
+            (x == 0 and y == 0) or (x == 0 and y == 7) 
+            or (x == 7 and y == 0) or (x == 7 and y == 7)
         )
 
+    def isOnBorder(self, x, y):
+        ########################################################
+        # - x: x location of the tile
+        # - y: y location of the tile
+        #------------------------------------------------------
+        # - return whether the tile is on border
+        #######################################################
+        return ( (x >= 0 and x <= 7 and y >= 0 and y <= 7) and
+            ((x == 0 ) or (y == 7) or (x == 7) or (y == 0))
+        )
+    
     def greedy_choose(self, board):
         ########################################################
         # - board: the status of the tiles in the current board
