@@ -14,11 +14,11 @@ def main():
     #玩家先下
     player_first = True
     #玩家對電腦
+    board = Board()
     pvc = False
     cvx = "computer2"
-    game = GameLogic(pvc, player_first)
-    board = Board(game)
-    agent = Agent(pvc, player_first)
+    status = 0
+    # agent = Agent(pvc, player_first)
 
 
     """
@@ -57,7 +57,7 @@ def main():
     while True:
         
         # 遊戲開始
-        if game.status == 0:
+        if status == 0:
             for event in pygame.event.get():
 
                 # 取得滑鼠游標位置
@@ -77,13 +77,11 @@ def main():
                     按下start健
                     """
                     if 315 <= x and x <= 390 and 25 <= y and y <= 75:
-                    
-                        game = GameLogic(pvc, player_first)
-                        board = Board(game)
-                        agent = Agent(pvc, player_first)
-                        game.status = 1
-                        
-                        at_start = False
+                        agent1 = Agent("white")
+                        agent2 = Agent("black")
+                        game = GameLogic(agent1, agent2, screen)
+                        # at_start = False
+                        status = 1
                         pygame.time.delay(750)
                     """
                     選擇黑棋或白棋
@@ -93,8 +91,8 @@ def main():
                     elif 350 <= x and x <= 430 and 80 <= y and y <= 130:
                         player_first = False
 
-            board.drawBoard(screen, game)
-            if game.status == 0:
+            board.drawBoard(screen, status)
+            if status == 0:
                 if at_start:
                     pygame.draw.rect(screen, (255, 0, 0), (315, 25, 75, 50), 0)
                 else:
@@ -110,35 +108,12 @@ def main():
                 screen.blit(text_start, button_start)
                 screen.blit(text_black, button_black)
                 screen.blit(text_white, button_white)
-                opponent = "computer1"
         
         # 遊戲進行
-        elif game.status == 1:
-            if game.turn == "computer1":
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        pygame.quit()
-                        sys.exit()
-                pygame.time.delay(500)
-                game.ComputerTurn(board.board, cvx, agent)
-            elif game.turn == "computer2":
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        pygame.quit()
-                        sys.exit()
-                pygame.time.delay(500)
-                game.ComputerTurn(board.board, "computer1", agent)
-            elif game.turn == "player":
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        pygame.quit()
-                        sys.exit()
-                    elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                        game.PlayerTurn(board.board, opponent)
-            board.drawBoard(screen, game)
-        
-        # 遊戲結束
-        elif game.status==2:
+        elif status == 1:
+            game.run(screen, main_clock)
+            # 遊戲結束
+            screen.fill((0, 0, 0))
             for event in pygame.event.get():
                 # 取得滑鼠游標位置
                 x, y = pygame.mouse.get_pos()
@@ -158,14 +133,14 @@ def main():
                     sys.exit()
                 elif event.type == MOUSEBUTTONDOWN:
                     if 90 <= x and x <= 170 and 280 <= y and y <= 320:
-                        game.status = 0
+                        status = 0
                         at_quit = False
                         at_restart = False
                     elif 270 <= x and x <= 350 and 280 <= y and y <= 320:
                         pygame.quit()
                         sys.exit()
 
-            board.drawBoard(screen, game)
+            board.drawBoard(screen, 2, game)
             if at_restart:
                 pygame.draw.rect(screen, (255, 0, 0), (90, 280, 80, 40), 0)
             else:
@@ -176,6 +151,7 @@ def main():
                 pygame.draw.rect(screen, (255, 255, 255), (270, 280, 80, 40), 2)
             screen.blit(text_restart, button_restart)
             screen.blit(text_quit, button_quit)
+                    
 
         pygame.display.update()
         main_clock.tick(40)
