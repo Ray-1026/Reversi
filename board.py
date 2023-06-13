@@ -1,8 +1,8 @@
 from gamelogic import pygame
-
+import utils
 
 class Board:
-    def __init__(self, game):
+    def __init__(self):
         """
         物件: 棋盤
 
@@ -26,8 +26,9 @@ class Board:
         self.hintImage = pygame.image.load("img/hint.jpg")
         self.hintRect = self.hintImage.get_rect()
 
-        self.LastMoveImage = pygame.image.load("img/" + game.opponentSide + "1.jpg")
-        self.LastMoveRect = self.LastMoveImage.get_rect()
+        self.BlackLastMoveImage = pygame.image.load("img/black1.jpg")
+        self.WhiteLastMoveImage = pygame.image.load("img/white1.jpg")
+        self.LastMoveRect = self.WhiteLastMoveImage.get_rect()
 
         # 初始化棋盤
         self.board = self.getNewBoard()
@@ -58,15 +59,15 @@ class Board:
         self.board[4][3] = "white"
         self.board[4][4] = "black"
 
-    def drawBoard(self, screen, game):
+    def drawBoard(self, screen, status, game=None):
         """
         繪製遊戲畫面，包括開始、棋盤、結束畫面
         """
         screen.fill(self.BACKGROUNDCOLOR)
-        if game.status == 0:
+        if status == 0:
             screen.blit(self.startImage, self.boardRect, self.boardRect)
 
-        elif game.status == 1:
+        elif status == 1:
             screen.blit(self.boardImage, self.boardRect, self.boardRect)
 
             # 根據board判斷8*8的位置是要放白棋、黑棋的圖片，或什麼都不放
@@ -79,40 +80,34 @@ class Board:
                         screen.blit(self.blackImage, rectDst, self.blackRect)
                     elif self.board[x][y] == "white":
                         screen.blit(self.whiteImage, rectDst, self.whiteRect)
-
-            # 判斷電腦的最後一步在哪裡，並標記
-            if (
-                game.last_move
-                and self.board[game.last_move[0]][game.last_move[1]] == game.opponentSide
-            ):
-                x, y = game.last_move[0], game.last_move[1]
-                rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
-                screen.blit(self.LastMoveImage, rectDst, self.LastMoveRect)
+                if game:
+                    x, y = game.last_move[0], game.last_move[1]
+                    rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
+                    img = self.BlackLastMoveImage if self.board[x][y] == "black" else self.WhiteLastMoveImage
+                    screen.blit(img, rectDst, self.LastMoveRect)
 
             # 如果現在是玩家的回合，給出哪裡可以下的提示
-            if game.turn == "player":
-                hint = game.getValidMoves(self.board, game.mySide)
+            if game and game.cur_agent.name == "human":
+                hint = utils.getValidMoves(self.board, game.cur_agent.side)
                 for x, y in hint:
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                     screen.blit(self.hintImage, rectDst, self.hintRect)
 
         else:
             # 計算結果
-            score = game.getScore(self.board)
+            score = utils.getScore(game.board.board)
             result = "Black  " + str(score["black"]) + "   :   " + str(score["white"]) + "  White"
 
             # 判斷黑白的輸贏
             if score["black"] > score["white"]:
-                winner = "black"
+                winner = "Black"
             elif score["black"] < score["white"]:
-                winner = "white"
+                winner = "White"
             else:
                 winner = "tie"
 
-            if winner == game.mySide:
-                message = "Player Win"
-            elif winner == game.opponentSide:
-                message = "Computer Win"
+            if winner != "tie":
+                message = f"{winner} Win"
             else:
                 message = "Tie"
 

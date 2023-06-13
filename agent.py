@@ -1,25 +1,14 @@
 import random
-from gamelogic import GameLogic
-
+import utils
 
 class Agent:
-    def __init__(self, pvc, player_first):
+    def __init__(self, side):
         ########################################################
         # - player_first: whether player move first
         ########################################################
-        self.game = GameLogic(pvc, player_first)
-
-    def getBoardCopy(self, board):
-        ########################################################
-        # - board: the status of the tiles in the current board
-        ########################################################
-        copied = []
-        for i in range(8):
-            copied.append(["none"] * 8)
-        for x in range(8):
-            for y in range(8):
-                copied[x][y] = board[x][y]
-        return copied
+        self.side = side
+        self.name = "agent"
+        self.opponentSide = "black" if side == "white" else "white"
 
     def isOnCorner(self, x, y):
         ########################################################
@@ -44,25 +33,26 @@ class Agent:
             ((x == 0 ) or (y == 7) or (x == 7) or (y == 0))
         )
     
-    def choose(self, board):
+    def choose(self, board, valid_moves):
         ########################################################
         # - board: the status of the tiles in the current board
         #------------------------------------------------------
         # - return false if no possible move left, otherwise
         # - return the best move with greedy algorithm
         #######################################################
-        possible = self.game.getValidMoves(board, self.game.opponentSide)
-        random.shuffle(possible)
+        # possible = self.game.getValidMoves(board, self.game.opponentSide)
+        random.shuffle(valid_moves)
 
         bestScore = -1
         bestMove = False
-        for x, y in possible:
+        for x, y in valid_moves:
             if self.isOnCorner(x, y):
                 return [x, y]
-            copyBoard = self.getBoardCopy(board)
-            self.game.flip(copyBoard, self.game.opponentSide, x, y)
-            score = self.game.getScore(copyBoard)[self.game.opponentSide]
+            copyBoard = utils.getBoardCopy(board)
+            utils.flip(copyBoard, self.opponentSide, x, y)
+            score = utils.getScore(copyBoard)[self.opponentSide]
             if score > bestScore:
                 bestMove = [x, y]
                 bestScore = score
+        
         return bestMove
