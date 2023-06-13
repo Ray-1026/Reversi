@@ -8,9 +8,10 @@ from board import Board
 class GameLogic:
     def __init__(self, agent1, agent2, screen):
         """
-        物件 : 遊戲邏輯
-
-        函式 :
+        --------------------------------------------------------
+        #### 物件 : 遊戲邏輯
+        --------------------------------------------------------
+        #### 函式
         - run() : 雙方開始對戰直到分出勝負
         --------------------------------------------------------
         #### Input
@@ -37,7 +38,16 @@ class GameLogic:
 
     def run(self, screen, main_clock):
         """
-        雙方開始對戰直到分出勝負
+        --------------------------------------------------------
+        #### 功能 : 雙方開始對戰直到分出勝負
+        --------------------------------------------------------
+        #### 參數
+        - screen : 遊戲視窗
+        - main_clock : 控制遊戲幀數
+        --------------------------------------------------------
+        #### 回傳值
+        - 無
+        --------------------------------------------------------
         """
         self.cur_agent = self.agent1 if self.agent1.side == "black" else self.agent2
         while not utils.noMoreMove(self.board.board):
@@ -60,9 +70,9 @@ class GameLogic:
                 if utils.getValidMoves(self.board.board, self.cur_agent.opponentSide):
                     self.cur_agent = self.agent2 if self.cur_agent == self.agent1 else self.agent1
 
-            self.board.drawBoard(screen, "run", self)
+            self.board.draw(screen, "run", self)
 
             pygame.display.update()
-            main_clock.tick(40)
+            main_clock.tick(60)
 
         pygame.time.delay(1000)  # 停留在結果畫面1秒

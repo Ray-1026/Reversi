@@ -10,7 +10,6 @@ def main():
     """
     # Pygame 啟動 !!!
     """
-
     # 初始化
     pygame.init()
     main_clock = pygame.time.Clock()
@@ -93,7 +92,7 @@ def main():
                     elif pvc and 285 <= x and x <= 335 and 85 <= y and y <= 115:  # 在PVC模式下選擇白棋
                         chooseSide = "white"
 
-            board.drawBoard(screen, status)
+            board.draw(screen, status)
             if status == "start":
                 if at_start:
                     pygame.draw.rect(screen, red, (300, 125, 75, 50), 0)
@@ -156,7 +155,7 @@ def main():
                         pygame.quit()
                         sys.exit()
 
-            board.drawBoard(screen, status, game)
+            board.draw(screen, status, game)
             if at_restart:
                 pygame.draw.rect(screen, red, (90, 280, 80, 40), 0)
             else:
@@ -171,7 +170,7 @@ def main():
             screen.blit(text_quit, button_quit)
 
         pygame.display.update()
-        main_clock.tick(40)
+        main_clock.tick(60)
 
 
 if __name__ == "__main__":
