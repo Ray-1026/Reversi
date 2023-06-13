@@ -11,10 +11,15 @@ def main():
     """
     pygame.init()
     main_clock = pygame.time.Clock()
+    #玩家先下
     player_first = True
-    game = GameLogic(player_first)
+    #玩家對電腦
+    pvc = False
+    cvx = "computer2"
+    game = GameLogic(pvc, player_first)
     board = Board(game)
-    agent = Agent(player_first)
+    agent = Agent(pvc, player_first)
+
 
     """
     文字、按鈕設定
@@ -73,9 +78,9 @@ def main():
                     """
                     if 315 <= x and x <= 390 and 25 <= y and y <= 75:
                     
-                        game = GameLogic(player_first)
+                        game = GameLogic(pvc, player_first)
                         board = Board(game)
-                        agent = Agent(player_first)
+                        agent = Agent(pvc, player_first)
                         game.status = 1
                         
                         at_start = False
@@ -105,23 +110,31 @@ def main():
                 screen.blit(text_start, button_start)
                 screen.blit(text_black, button_black)
                 screen.blit(text_white, button_white)
+                opponent = "computer1"
         
         # 遊戲進行
         elif game.status == 1:
-            if game.turn == "computer":
+            if game.turn == "computer1":
                 for event in pygame.event.get():
                     if event.type == QUIT:
                         pygame.quit()
                         sys.exit()
                 pygame.time.delay(500)
-                game.ComputerTurn(board.board, agent)
+                game.ComputerTurn(board.board, cvx, agent)
+            elif game.turn == "computer2":
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        pygame.quit()
+                        sys.exit()
+                pygame.time.delay(500)
+                game.ComputerTurn(board.board, "computer1", agent)
             elif game.turn == "player":
                 for event in pygame.event.get():
                     if event.type == QUIT:
                         pygame.quit()
                         sys.exit()
                     elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                        game.PlayerTurn(board.board)
+                        game.PlayerTurn(board.board, opponent)
             board.drawBoard(screen, game)
         
         # 遊戲結束

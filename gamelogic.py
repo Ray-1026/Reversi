@@ -3,25 +3,37 @@ import pygame
 
 class GameLogic:
     #宣告
-    def __init__(self, player_first):
+    def __init__(self, pvc, player_first):
         ########################################################
         # - player_first: whether player move first
+        # - pvc: whether the game is player against computer
         #------------------------------------------------------
-        # - playerSide: the side of the player's disk
-        # - computerSide:  the side of the player's disk
+        # - opponent: who you are against
+        # - mySide: the side of the player1's disk
+        # - opponentSide:  the side of the player2's disk
         # - turn: who's turn to play
         # - last_move: the last move of the computer
         # - status: the status of the game
         # - direct: the 8 directions
         ########################################################
-        if player_first:
-            self.playerSide = "black"
-            self.computerSide = "white"
-            self.turn = "player"
-        else:
-            self.playerSide = "white"
-            self.computerSide = "black"
-            self.turn = "computer"
+        if pvc: #人對電腦
+            self.opponent = "computer1"
+            if player_first:
+                self.mySide = "black"
+                self.opponentSide = "white"
+                self.turn = "player"
+            else:
+                self.mySide = "white"
+                self.opponentSide = "black"
+                self.turn = "computer1"
+            
+        else: #電腦對電腦
+            #computer1 黑
+            self.mySide = "black"
+            self.opponentSide = "white"
+            self.turn = "computer1"
+            self.opponent = "computer2"
+
         self.last_move = []
         self.status = 0
         self.direct = [
@@ -32,7 +44,7 @@ class GameLogic:
             [0, -1],
             [-1, -1],
             [-1, 0],
-            [-1, 1],
+            [-1, 1]
         ]
 
     def getFlipDisks(self, board, side, xstart, ystart):
@@ -139,36 +151,37 @@ class GameLogic:
         #------------------------------------------------------
         # - return whether there is no more move  
         #######################################################
-        return (not self.getValidMoves(board, self.playerSide) 
-            and not self.getValidMoves(board, self.computerSide))
+        return (not self.getValidMoves(board, self.mySide) 
+            and not self.getValidMoves(board, self.opponentSide))
 
-    def PlayerTurn(self, board):
+    def PlayerTurn(self, board, opponent):
         #######################################################
         # - board: the status of the tiles in the current board
         #------------------------------------------------------
         # - player chooses the position with mouse
         #######################################################
-        if self.noMoreMove(board):
-            self.status = 2
         x, y = pygame.mouse.get_pos()
         col, row = int((x - 20) / 50), int((y - 20) / 50)
-        if self.isValidMove(board, self.playerSide, col, row):
-            self.flip(board, self.playerSide, col, row)
-            if self.getValidMoves(board, self.computerSide):
-                self.turn = "computer" 
+        if self.isValidMove(board, self.mySide, col, row):
+            self.flip(board, self.mySide, col, row)
+            if self.getValidMoves(board, self.opponentSide):
+                self.turn = opponent
+        if self.noMoreMove(board):
+            self.status = 2    
+        
 
-    def ComputerTurn(self, board, agent):
+    def ComputerTurn(self, board, opponent, agent):
         #######################################################
         # - board: the status of the tiles in the current board
         #------------------------------------------------------
         # - cmoputer chooses the position with algorithm
         #######################################################
-        if self.noMoreMove(board):
-            self.status = 2
         pos = agent.choose(board)
         if pos:
-            self.flip(board, self.computerSide, pos[0], pos[1])
+            self.flip(board, self.opponentSide, pos[0], pos[1])
             self.last_move = [pos[0], pos[1]]
-        if self.getValidMoves(board, self.playerSide):
-            self.turn = "player"
+        if self.getValidMoves(board, self.mySide):
+            self.turn = opponent
+        if self.noMoreMove(board):
+            self.status = 2
 

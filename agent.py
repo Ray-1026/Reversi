@@ -3,11 +3,11 @@ from gamelogic import GameLogic
 
 
 class Agent:
-    def __init__(self, player_first):
+    def __init__(self, pvc, player_first):
         ########################################################
         # - player_first: whether player move first
         ########################################################
-        self.game = GameLogic(player_first)
+        self.game = GameLogic(pvc, player_first)
 
     def getBoardCopy(self, board):
         ########################################################
@@ -51,7 +51,7 @@ class Agent:
         # - return false if no possible move left, otherwise
         # - return the best move with greedy algorithm
         #######################################################
-        possible = self.game.getValidMoves(board, self.game.computerSide)
+        possible = self.game.getValidMoves(board, self.game.opponentSide)
         random.shuffle(possible)
 
         bestScore = -1
@@ -60,8 +60,8 @@ class Agent:
             if self.isOnCorner(x, y):
                 return [x, y]
             copyBoard = self.getBoardCopy(board)
-            self.game.flip(copyBoard, self.game.computerSide, x, y)
-            score = self.game.getScore(copyBoard)[self.game.computerSide]
+            self.game.flip(copyBoard, self.game.opponentSide, x, y)
+            score = self.game.getScore(copyBoard)[self.game.opponentSide]
             if score > bestScore:
                 bestMove = [x, y]
                 bestScore = score

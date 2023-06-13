@@ -26,7 +26,7 @@ class Board:
         self.hintImage = pygame.image.load("img/hint.jpg")
         self.hintRect = self.hintImage.get_rect()
 
-        self.LastMoveImage = pygame.image.load("img/" + game.computerSide + "1.jpg")
+        self.LastMoveImage = pygame.image.load("img/" + game.opponentSide + "1.jpg")
         self.LastMoveRect = self.LastMoveImage.get_rect()
 
         # 初始化棋盤
@@ -83,7 +83,7 @@ class Board:
             # 判斷電腦的最後一步在哪裡，並標記
             if (
                 game.last_move
-                and self.board[game.last_move[0]][game.last_move[1]] == game.computerSide
+                and self.board[game.last_move[0]][game.last_move[1]] == game.opponentSide
             ):
                 x, y = game.last_move[0], game.last_move[1]
                 rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
@@ -91,7 +91,7 @@ class Board:
 
             # 如果現在是玩家的回合，給出哪裡可以下的提示
             if game.turn == "player":
-                hint = game.getValidMoves(self.board, game.playerSide)
+                hint = game.getValidMoves(self.board, game.mySide)
                 for x, y in hint:
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                     screen.blit(self.hintImage, rectDst, self.hintRect)
@@ -109,9 +109,9 @@ class Board:
             else:
                 winner = "tie"
 
-            if winner == game.playerSide:
+            if winner == game.mySide:
                 message = "Player Win"
-            elif winner == game.computerSide:
+            elif winner == game.opponentSide:
                 message = "Computer Win"
             else:
                 message = "Tie"
