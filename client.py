@@ -34,7 +34,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             
         while True:
             color = s.recv(8192).decode('utf-8')
-            print(color)
             if color == "Black" or color == "White":
                 print("Start")
                 break

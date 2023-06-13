@@ -26,7 +26,7 @@ def handle_match(client1, client2, client1_name, client2_name, first_macth):
             move = first.recv(MSG_SIZE).decode('utf-8')
         except TimeoutError:
             print(f'{client1_name} timeout')
-            break
+            return False
         if move == 'END':
             break
         second.sendall(move.encode('utf-8'))
@@ -35,12 +35,13 @@ def handle_match(client1, client2, client1_name, client2_name, first_macth):
             move = second.recv(MSG_SIZE).decode('utf-8')
         except TimeoutError:
             print(f'{client2_name} timeout')
-            break
+            return False
         
         if move == 'END':
             break
         first.sendall(move.encode('utf-8'))
     
+    return True
 
 
 
@@ -68,6 +69,7 @@ def handle_client(client_conn, client_addr):
             opponent = client_conn.recv(MSG_SIZE).decode('utf-8')
             if opponent not in passive_list:
                 client_conn.sendall('This user not available'.encode('utf-8'))
+                client_conn.sendall(pickle.dumps(passive_list))
             else:
                 print(f'{client_name} wants to play with {opponent}')
                 client_conn.sendall('Waiting for opponent'.encode('utf-8'))
@@ -80,7 +82,52 @@ def handle_client(client_conn, client_addr):
                     oppo_conn = client_dict[opponent][0]
                     client_conn.settimeout(TIMEOUT)
                     oppo_conn.settimeout(TIMEOUT)
-                    handle_match(client_conn, oppo_conn, client_name, opponent, True)
+                    print(f"Black: {client_name}, White: {opponent}")
+                    exit_code = handle_match(client_conn, oppo_conn, client_name, opponent, True)
+                    if not exit_code:
+                        print(f"Timeout error")
+                        return
+                    client_conn.settimeout(None)
+                    oppo_conn.settimeout(None)
+                    client_conn.sendall('END'.encode('utf-8'))
+                    oppo_conn.sendall('END'.encode('utf-8'))
+                    client_res = client_conn.recv(MSG_SIZE).decode('utf-8') # Return "<black> <white>"
+                    oppo_res = oppo_conn.recv(MSG_SIZE).decode('utf-8')
+                    if client_res != oppo_res:
+                        print('Error')
+                        return
+                    else:
+                        first_res = client_res.split(' ')
+                        print(f'Result: Black: {first_res[0]}, White: {first_res[1]}')
+                    print(f"Black: {opponent}, White: {client_name}")
+                    client_conn.settimeout(TIMEOUT)
+                    oppo_conn.settimeout(TIMEOUT)
+                    exit_code = handle_match(client_conn, oppo_conn, client_name, opponent, False)
+                    if not exit_code:
+                        print(f"Timeout error")
+                        return
+                    client_conn.settimeout(None)
+                    oppo_conn.settimeout(None)
+                    client_conn.sendall('END'.encode('utf-8'))
+                    oppo_conn.sendall('END'.encode('utf-8'))
+                    client_res = client_conn.recv(MSG_SIZE).decode('utf-8') # Return "<black> <white>"
+                    oppo_res = oppo_conn.recv(MSG_SIZE).decode('utf-8')
+                    if client_res != oppo_res:
+                        print('Error')
+                        return
+                    else:
+                        second_res = client_res.split(' ')
+                        print(f'Result: Black: {second_res[0]}, White: {second_res[1]}')
+                    client_score = int(first_res[0]) + int(second_res[1])
+                    oppo_score = int(first_res[1]) + int(second_res[0])
+                    print(f"{client_name} has {client_score} points")
+                    print(f"{opponent} has {oppo_score} points")
+                    if client_score > oppo_score:
+                        print(f"{client_name} won")
+                    elif client_score < oppo_score:
+                        print(f"{opponent} won")
+                    else:
+                        print("Draw")
                     print(f'Match between {client_name} and {opponent} ended')
                     break
     else:
