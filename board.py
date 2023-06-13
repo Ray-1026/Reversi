@@ -1,33 +1,36 @@
 from gamelogic import pygame
 import utils
 
+
 class Board:
     def __init__(self):
         """
-        物件: 棋盤
+        物件 : 棋盤
 
-        功能: \\
-        getNewBoard() -> 建立全新的空白棋盤 \\
-        resetBoard() -> 重製棋盤，使棋盤上只有黑白各兩子 \\
-        drawBoard() -> 繪製遊戲畫面，包括開始、棋盤、結束畫面 
+        功能 :
+        - getNewBoard() : 建立全新的空白棋盤
+        - resetBoard() : 重製棋盤，使棋盤上只有黑白各兩子
+        - drawBoard() : 繪製遊戲畫面，包括開始、棋盤、結束畫面
         """
 
-        # 設定背景畫面顏色 (0, 0, 0) = 黑色
-        self.BACKGROUNDCOLOR = (0, 0, 0)
+        # 設定顏色
+        self.BACKGROUNDCOLOR = (0, 0, 0)  # (0, 0, 0) = 黑色
+        self.white = (255, 255, 255)
 
         # 讀取和載入圖片
         self.startImage = pygame.image.load("img/start.jpg")
         self.boardImage = pygame.image.load("img/board.jpg")
-        self.boardRect = self.boardImage.get_rect()
         self.blackImage = pygame.image.load("img/black.jpg")
-        self.blackRect = self.blackImage.get_rect()
         self.whiteImage = pygame.image.load("img/white.jpg")
-        self.whiteRect = self.whiteImage.get_rect()
         self.hintImage = pygame.image.load("img/hint.jpg")
-        self.hintRect = self.hintImage.get_rect()
-
         self.BlackLastMoveImage = pygame.image.load("img/black1.jpg")
         self.WhiteLastMoveImage = pygame.image.load("img/white1.jpg")
+
+        # 讀取圖片大小
+        self.hintRect = self.hintImage.get_rect()
+        self.whiteRect = self.whiteImage.get_rect()
+        self.blackRect = self.blackImage.get_rect()
+        self.boardRect = self.boardImage.get_rect()
         self.LastMoveRect = self.WhiteLastMoveImage.get_rect()
 
         # 初始化棋盤
@@ -64,10 +67,10 @@ class Board:
         繪製遊戲畫面，包括開始、棋盤、結束畫面
         """
         screen.fill(self.BACKGROUNDCOLOR)
-        if status == 0:
+        if status == "start":
             screen.blit(self.startImage, self.boardRect, self.boardRect)
 
-        elif status == 1:
+        elif status == "run":
             screen.blit(self.boardImage, self.boardRect, self.boardRect)
 
             # 根據board判斷8*8的位置是要放白棋、黑棋的圖片，或什麼都不放
@@ -80,7 +83,7 @@ class Board:
                         screen.blit(self.blackImage, rectDst, self.blackRect)
                     elif self.board[x][y] == "white":
                         screen.blit(self.whiteImage, rectDst, self.whiteRect)
-                if game:
+                if game and game.last_move:
                     x, y = game.last_move[0], game.last_move[1]
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                     img = self.BlackLastMoveImage if self.board[x][y] == "black" else self.WhiteLastMoveImage
@@ -93,7 +96,7 @@ class Board:
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                     screen.blit(self.hintImage, rectDst, self.hintRect)
 
-        else:
+        elif status == "end":
             # 計算結果
             score = utils.getScore(game.board.board)
             result = "Black  " + str(score["black"]) + "   :   " + str(score["white"]) + "  White"
@@ -113,7 +116,7 @@ class Board:
 
             # 印出結果的文字在遊戲畫面上
             font = pygame.font.SysFont("Arial", 35)
-            text1 = font.render(result, True, (255, 255, 255))
-            text2 = font.render(message, True, (255, 255, 255))
+            text1 = font.render(result, True, self.white)
+            text2 = font.render(message, True, self.white)
             screen.blit(text1, text1.get_rect(center=(220, 120)))
             screen.blit(text2, text2.get_rect(center=(220, 200)))
