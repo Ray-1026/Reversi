@@ -6,12 +6,13 @@ import time
 HOST = ''
 PORT = 8080
 MSG_SIZE = 8192
+TIMEOUT = 100
 
 client_dict = {} # key: name, value: (socket, addr)
 passive_list = [] # List of clients who are waiting for opponent
 match_list = [] # Use tuple to represent a match
 
-def handle_match(client1, client2, first_macth):
+def handle_match(client1, client2, client1_name, client2_name, first_macth):
     if first_macth:
         first, second = client1, client2
     else:
@@ -21,18 +22,21 @@ def handle_match(client1, client2, first_macth):
     second.sendall("White".encode('utf-8'))
     while True:
         # Receive move from first player
-        move = first.recv(MSG_SIZE).decode('utf-8')
-        if not move:
-            print(f'{client1} timeout')
+        try:
+            move = first.recv(MSG_SIZE).decode('utf-8')
+        except TimeoutError:
+            print(f'{client1_name} timeout')
             break
         if move == 'END':
             break
         second.sendall(move.encode('utf-8'))
         # Receive move from second player
-        move = second.recv(MSG_SIZE).decode('utf-8')
-        if not move:
-            print(f'{client2} timeout')
+        try:
+            move = second.recv(MSG_SIZE).decode('utf-8')
+        except TimeoutError:
+            print(f'{client2_name} timeout')
             break
+        
         if move == 'END':
             break
         first.sendall(move.encode('utf-8'))
@@ -74,7 +78,9 @@ def handle_client(client_conn, client_addr):
                     match_list.append((client_name, opponent))
                     print(f'Match between {client_name} and {opponent} started')
                     oppo_conn = client_dict[opponent][0]
-                    handle_match(client_conn, oppo_conn, True)
+                    client_conn.settimeout(TIMEOUT)
+                    oppo_conn.settimeout(TIMEOUT)
+                    handle_match(client_conn, oppo_conn, client_name, opponent, True)
                     print(f'Match between {client_name} and {opponent} ended')
                     break
     else:
@@ -90,7 +96,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     # s.setblocking(False)
     s.listen(40) # Up to 40 clients
-    # s.settimeout(5)
     print("Reversi server is running...")
 
     while True:
