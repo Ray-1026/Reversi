@@ -13,6 +13,23 @@ class Board:
         - resetBoard() : 重製棋盤，使棋盤上只有黑白各兩子
         - drawBoard() : 繪製遊戲畫面，包括開始、棋盤、結束畫面
         --------------------------------------------------------
+        #### 傳入的參數
+        - 無
+        --------------------------------------------------------
+        #### 物件中的屬性
+        - BACKGROUNDCOLOR : 背景顏色 (黑色)
+        - white : 白色
+        - startImage : 遊戲起始畫面圖片
+        - boardImage : 棋盤圖片
+        - blackImage : 黑棋圖片
+        - whiteImage : 白棋圖片
+        - hintImage : 提示圖片
+        - BlackLastMoveImage : 黑棋上一步的提示圖片
+        - WhiteLastMoveImage : 白棋上一步的提示圖片
+        - boardRect : 棋盤圖片大小
+        - cellRect : 棋盤方格大小
+        - board : 棋盤
+        --------------------------------------------------------
         """
 
         # 設定顏色
@@ -29,11 +46,8 @@ class Board:
         self.WhiteLastMoveImage = pygame.image.load("img/white1.jpg")
 
         # 讀取圖片大小
-        self.hintRect = self.hintImage.get_rect()
-        self.whiteRect = self.whiteImage.get_rect()
-        self.blackRect = self.blackImage.get_rect()
         self.boardRect = self.boardImage.get_rect()
-        self.LastMoveRect = self.WhiteLastMoveImage.get_rect()
+        self.cellRect = self.whiteImage.get_rect()
 
         # 初始化棋盤
         self.board = self.getNewBoard()
@@ -48,7 +62,7 @@ class Board:
         - 無
         --------------------------------------------------------
         #### 回傳值
-        - board : 8*8的二維陣列，每一個元素皆為"none"
+        - 8*8的二維陣列, 每一個元素皆為"none"
         --------------------------------------------------------
         """
         # 空白的8*8棋盤，"none"表示該位置沒有棋子
@@ -86,9 +100,9 @@ class Board:
         #### 功能 : 繪製遊戲畫面，包括開始、棋盤、結束畫面
         --------------------------------------------------------
         #### 參數
-        - screen :
-        - status :
-        - game :
+        - screen : 遊戲視窗
+        - status : 遊戲狀態
+        - game : 遊戲邏輯物件
         --------------------------------------------------------
         #### 回傳值
         - 無
@@ -104,25 +118,27 @@ class Board:
             # 根據board判斷8*8的位置是要放白棋、黑棋的圖片，或什麼都不放
             for x in range(8):
                 for y in range(8):
-                    # 計算圖片該放的位置
+                    # 計算圖片位置
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
                     # "black"放黑棋的圖片；"white"放白棋的圖片
                     if self.board[x][y] == "black":
-                        screen.blit(self.blackImage, rectDst, self.blackRect)
+                        screen.blit(self.blackImage, rectDst, self.cellRect)
                     elif self.board[x][y] == "white":
-                        screen.blit(self.whiteImage, rectDst, self.whiteRect)
-                if game and game.last_move:
-                    x, y = game.last_move[0], game.last_move[1]
-                    rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
-                    img = self.BlackLastMoveImage if self.board[x][y] == "black" else self.WhiteLastMoveImage
-                    screen.blit(img, rectDst, self.LastMoveRect)
+                        screen.blit(self.whiteImage, rectDst, self.cellRect)
+
+            # 在last_move的位置畫出上一步的提示圖片
+            if game and game.last_move:
+                x, y = game.last_move[0], game.last_move[1]
+                rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
+                img = self.BlackLastMoveImage if self.board[x][y] == "black" else self.WhiteLastMoveImage
+                screen.blit(img, rectDst, self.cellRect)
 
             # 如果現在是玩家的回合，給出哪裡可以下的提示
             if game and game.cur_agent.name == "human":
                 hint = utils.getValidMoves(self.board, game.cur_agent.side)
                 for x, y in hint:
                     rectDst = pygame.Rect(x * 50 + 20, y * 50 + 20, 50, 50)
-                    screen.blit(self.hintImage, rectDst, self.hintRect)
+                    screen.blit(self.hintImage, rectDst, self.cellRect)
 
         elif status == "end":
             # 計算結果

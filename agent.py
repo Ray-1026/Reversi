@@ -16,7 +16,7 @@ class Agent:
         #### 傳入的參數
         - side : 此電腦拿的棋子顏色 (以字串型態表示 : "black"或"white")
         --------------------------------------------------------
-        #### Init
+        #### 物件中的屬性
         - side : 此電腦拿的棋子顏色
         - name : 此物件的名稱，因為是電腦所以命名成"agent"
         - opponentSide : 對手的棋子顏色
@@ -36,7 +36,7 @@ class Agent:
         - y : 棋盤的y軸座標
         --------------------------------------------------------
         #### 回傳值
-        - True or False :
+        - 如果(x, y)在棋盤角落, 回傳True ; 否則回傳False
         --------------------------------------------------------
         """
         return (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7)
@@ -51,7 +51,7 @@ class Agent:
         - y : 棋盤的y軸座標
         --------------------------------------------------------
         #### 回傳值
-        - True or False :
+        - 如果(x, y)在棋盤邊緣, 回傳True ; 否則回傳False
         --------------------------------------------------------
         """
         return (x >= 0 and x <= 7 and y >= 0 and y <= 7) and ((x == 0) or (y == 7) or (x == 7) or (y == 0))
@@ -59,22 +59,26 @@ class Agent:
     def choose(self, board, valid_moves):
         """
         --------------------------------------------------------
-        #### 功能 : 選擇下一步的位置
+        #### 功能 : 選擇下一步的位置 (最白癡的greedy演算法)
         --------------------------------------------------------
         #### 參數
-        - board :
-        - valid_moves :
+        - board : 棋盤
+        - valid_moves : 目前可以下的位置 (資料型態 : 陣列)
         --------------------------------------------------------
         #### 回傳值
+        - 含有兩個元素的陣列，表示最後選擇的位置 ; 若沒有選擇, 回傳None
         --------------------------------------------------------
         """
         random.shuffle(valid_moves)
 
         bestScore = -1
-        bestMove = False
+        bestMove = None
         for x, y in valid_moves:
+            # 如果(x, y)在棋盤角落，直接選擇下在那裏
             if self.isOnCorner(x, y):
                 return [x, y]
+
+            # 下在(x, y)的位置，並選擇分數最高的
             copyBoard = utils.getBoardCopy(board)
             utils.flip(copyBoard, self.opponentSide, x, y)
             score = utils.getScore(copyBoard)[self.opponentSide]

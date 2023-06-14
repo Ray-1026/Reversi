@@ -76,11 +76,11 @@ def main():
                         at_start = False
                         status = "run"
                         if pvc:  # 選擇PVC模式
-                            agent1 = PlayerAgent(chooseSide)
-                            agent2 = Agent("white" if chooseSide == "black" else "black")
+                            agent1 = PlayerAgent(chooseSide)  # 玩家
+                            agent2 = Agent("white" if chooseSide == "black" else "black")  # 電腦
                         else:  # 選擇CVC模式
-                            agent1 = Agent("white")
-                            agent2 = Agent("black")
+                            agent1 = Agent("white")  # 1號電腦
+                            agent2 = Agent("black")  # 2號電腦
                         game = GameLogic(agent1, agent2, screen)
                         pygame.time.delay(750)
                     elif 240 <= x and x <= 320 and 40 <= y and y <= 80:  # 按下PVC模式
@@ -122,7 +122,7 @@ def main():
         # 遊戲進行
         elif status == "run":
             game.run(screen, main_clock)
-            status = "end"
+            status = "end"  # 遊戲結束後變換狀態
 
         # 遊戲結束
         elif status == "end":
@@ -147,11 +147,11 @@ def main():
                     pygame.quit()
                     sys.exit()
                 elif event.type == MOUSEBUTTONDOWN:
-                    if 90 <= x and x <= 170 and 280 <= y and y <= 320:
+                    if 90 <= x and x <= 170 and 280 <= y and y <= 320:  # 按下restart
                         status = "start"
                         at_quit = False
                         at_restart = False
-                    elif 270 <= x and x <= 350 and 280 <= y and y <= 320:
+                    elif 270 <= x and x <= 350 and 280 <= y and y <= 320:  # 按下Quit
                         pygame.quit()
                         sys.exit()
 

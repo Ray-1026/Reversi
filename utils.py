@@ -7,40 +7,32 @@ def isOnBoard(x, y):
     #### 功能 : 判斷輸入的x、y值的位置是否在棋盤上
     --------------------------------------------------------
     #### 參數
-    - x :
-    - y :
+    - x : 棋盤的x軸座標
+    - y : 棋盤的y軸座標
     --------------------------------------------------------
     #### 回傳值
-    - True or False
+    - 如果(x, y)在棋盤範圍內, 回傳True ; 否則回傳False
     --------------------------------------------------------
     """
     return 7 >= x and x >= 0 and 7 >= y and y >= 0
 
 
-def isValidMove(board, side, xstart, ystart):
+def isValidMove(board, side, x, y):
     """
     --------------------------------------------------------
-    #### 功能 :
+    #### 功能 : 判斷黑或白棋能否下在棋盤的(x, y)處
     --------------------------------------------------------
     #### 參數
-    - board :
-    - side :
-    - xstart :
-    - ystart :
+    - board : 棋盤
+    - side : 棋子顏色
+    - x : 棋盤的x軸座標
+    - y : 棋盤的y軸座標
     --------------------------------------------------------
     #### 回傳值
-    - True or False :
+    - 如果棋子能下在(x, y), 回傳True ; 否則回傳False
     --------------------------------------------------------
     """
-    #######################################################
-    # - board: the status of the tiles in the current board
-    # - side: the side of the placed disk
-    # - xstart: x location of the placed disk
-    # - ystart: y location of the placed disk
-    # ------------------------------------------------------
-    # - return whether the move is valid
-    #######################################################
-    if not isOnBoard(xstart, ystart) or board[xstart][ystart] != "none" or len(getFlipDisks(board, side, xstart, ystart)) == 0:
+    if not isOnBoard(x, y) or board[x][y] != "none" or len(getFlipDisks(board, side, x, y)) == 0:
         return False
     return True
 
@@ -48,21 +40,16 @@ def isValidMove(board, side, xstart, ystart):
 def getValidMoves(board, side):
     """
     --------------------------------------------------------
-    #### 功能 :
+    #### 功能 : 獲得可以下的所有位置
     --------------------------------------------------------
     #### 參數
-    - board :
-    - side :
+    - board : 棋盤
+    - side : 棋子顏色
     --------------------------------------------------------
     #### 回傳值
+    - 回傳所有可以下的位置 (資料型態 : 二維陣列)
     --------------------------------------------------------
     """
-    #######################################################
-    # - board: the status of the tiles in the current board
-    # - side: the side of the placed disk
-    # ------------------------------------------------------
-    # - return the list of valid moves
-    #######################################################
     valid = []
     for x in range(8):
         for y in range(8):
@@ -77,23 +64,19 @@ def getScore(board):
     #### 功能 : 計算棋盤上黑棋和白棋的數量
     --------------------------------------------------------
     #### 參數
-    - board :
+    - board : 棋盤
     --------------------------------------------------------
     #### 回傳值
+    - 黑棋和白棋的分數 (資料型態 : 字典)
     --------------------------------------------------------
     """
-    #######################################################
-    # - board: the status of the tiles in the current board
-    # ------------------------------------------------------
-    # - return the scores of two sides
-    #######################################################
-    bscore = 0
-    wscore = 0
+    bscore = 0  # 黑棋分數
+    wscore = 0  # 白棋分數
     for x in range(8):
         for y in range(8):
-            if board[x][y] == "black":
+            if board[x][y] == "black":  # 黑棋分數+1
                 bscore += 1
-            elif board[x][y] == "white":
+            elif board[x][y] == "white":  # 白棋分數+1
                 wscore += 1
     return {"black": bscore, "white": wscore}
 
@@ -101,41 +84,36 @@ def getScore(board):
 def getFlipDisks(board, side, xstart, ystart):
     """
     --------------------------------------------------------
-    #### 功能 :
+    #### 功能 : 找到哪些棋子要被翻轉
     --------------------------------------------------------
     #### 參數
-    - board :
-    - side :
-    - xstart :
-    - ystart :
+    - board : 棋盤
+    - side : 棋子顏色
+    - xstart : 棋盤的x軸座標
+    - ystart : 棋盤的y軸座標
     --------------------------------------------------------
     #### 回傳值
+    - 回傳所有會被翻轉的棋子的位置 (資料型態 : 二維陣列)
     --------------------------------------------------------
     """
-    ########################################################
-    # - board: the status of the tiles in the current board
-    # - side: the side of the placed disk
-    # - xstart: x location of the the placed disk
-    # - ystart: y location of the the placed disk
-    # ------------------------------------------------------
-    # - return the list of disks that should be flipped
-    #######################################################
     board[xstart][ystart] = side
     otherside = "white"
     if side == "white":
         otherside = "black"
     flipped_disks = []
+
+    # 從(xstart, ystart)往8個方位找要被翻轉的棋子
     for xdirect, ydirect in direct:
         x, y = xstart + xdirect, ystart + ydirect
         temp = []
         while isOnBoard(x, y) and board[x][y] != "none":
-            if board[x][y] == otherside:
+            if not isOnBoard(x, y):  # 如果超出棋盤位置就停止
+                break
+            if board[x][y] == otherside:  # 如果找到的棋子顏色是對方的，繼續往下找
                 temp.append([x, y])
                 x += xdirect
                 y += ydirect
-            if not isOnBoard(x, y):
-                break
-            if board[x][y] == side:
+            elif board[x][y] == side:  # 如果找到的棋子顏色是我方的，停止往下找
                 flipped_disks += temp
                 break
     board[xstart][ystart] = "none"
@@ -145,28 +123,22 @@ def getFlipDisks(board, side, xstart, ystart):
 def flip(board, side, xstart, ystart):
     """
     --------------------------------------------------------
-    #### 功能 :
+    #### 功能 : 翻轉棋子
     --------------------------------------------------------
     #### 參數
-    - board :
-    - side :
-    - xstart :
-    - ystart :
+    - board : 棋盤
+    - side : 棋子顏色
+    - xstart : 棋盤的x軸座標
+    - ystart : 棋盤的y軸座標
     --------------------------------------------------------
     #### 回傳值
     - 無
     --------------------------------------------------------
     """
-    #######################################################
-    # - board: the status of the tiles in the current board
-    # - side: the side of the placed disk
-    # - xstart: x location of the the placed disk
-    # - ystart: y location of the the placed disk
-    # ------------------------------------------------------
-    # - return nothing and flip the disks on move
-    #######################################################
-    disks = getFlipDisks(board, side, xstart, ystart)
-    board[xstart][ystart] = side
+    disks = getFlipDisks(board, side, xstart, ystart)  # 取得要被翻轉的棋子
+    board[xstart][ystart] = side  # 在(xstart, ystart)的地方下棋
+
+    # 翻轉棋子顏色
     for x, y in disks:
         board[x][y] = side
 
@@ -177,16 +149,12 @@ def noMoreMove(board):
     #### 功能 : 判斷棋局是否結束
     --------------------------------------------------------
     #### 參數
-    - board :
+    - board : 棋盤
     --------------------------------------------------------
     #### 回傳值
+    - 若遊戲結束, 回傳True ; 否則回傳False
     --------------------------------------------------------
     """
-    #######################################################
-    # - board: the status of the tiles in the current board
-    # ------------------------------------------------------
-    # - return whether there is no more move
-    #######################################################
     return not getValidMoves(board, "white") and not getValidMoves(board, "black")
 
 
@@ -196,14 +164,12 @@ def getBoardCopy(board):
     #### 功能 : 複製一個8*8一模一樣的棋盤
     --------------------------------------------------------
     #### 參數
-    - board :
+    - board : 棋盤
     --------------------------------------------------------
     #### 回傳值
+    - 回傳複製後的8*8棋盤
     --------------------------------------------------------
     """
-    ########################################################
-    # - board: the status of the tiles in the current board
-    ########################################################
     copied = []
     for _ in range(8):
         copied.append(["none"] * 8)
