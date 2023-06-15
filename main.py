@@ -5,6 +5,8 @@ from board import Board
 from agent import Agent
 from player import PlayerAgent
 
+# from player import PlayerAgent
+from client import *
 
 def main():
     """
@@ -14,14 +16,21 @@ def main():
     pygame.init()
     main_clock = pygame.time.Clock()
     board = Board()
+    # s = connect_server()
 
     # 模式設定
     pvc = True
+    passive = True
+    user_name = ''
+    at_input = True
+    color = (255, 255, 255)
     chooseSide = "black"
     status = "start"
+    sub_status = "choose online mode"
 
     # 顏色設定
     white = (255, 255, 255)
+    black = (0, 0, 0)
     red = (255, 0, 0)
     green = (0, 255, 0)
 
@@ -35,6 +44,9 @@ def main():
     text_white = small_font.render("White", True, white)
     text_restart = small_font.render("Restart", True, white)
     text_quit = small_font.render("Quit", True, white)
+    text_PVP = large_font.render("PVP", True, white)
+    text_passive = large_font.render('Connect by others', True, white)
+    text_active= large_font.render('Connect others', True, white)
 
     # 按鈕位置設定
     button_start = text_start.get_rect(center=(335, 150))
@@ -44,12 +56,18 @@ def main():
     button_white = text_white.get_rect(center=(310, 100))
     button_restart = text_restart.get_rect(center=(130, 300))
     button_quit = text_quit.get_rect(center=(310, 300))
+    button_PVP = text_PVP.get_rect(center=(335, 210))
+    button_passive = text_passive.get_rect(center=(220, 180))
+    button_active = text_active.get_rect(center=(220, 260))
+    name_input_box = pygame.Rect(150, 204, 140, 40)
 
+    
     # 按鈕狀態設定
     at_start = False
     at_restart = False
     at_quit = False
-
+    at_PVP = False
+    
     # 視窗大小、名稱設定
     screen = pygame.display.set_mode((440, 440))
     pygame.display.set_caption("黑白棋 Reversi")
@@ -67,6 +85,12 @@ def main():
                     at_start = True
                 else:
                     at_start = False
+
+                if 300 <= x and x <= 375 and 185 <= y and y <= 235:
+                    at_PVP = True
+                else:
+                    at_PVP = False
+
 
                 if event.type == QUIT:
                     pygame.quit()
@@ -91,6 +115,9 @@ def main():
                         chooseSide = "black"
                     elif pvc and 285 <= x and x <= 335 and 85 <= y and y <= 115:  # 在PVC模式下選擇白棋
                         chooseSide = "white"
+                    elif 300 <= x and x <= 375 and 185 <= y and y <= 235:
+                        at_PVP = False
+                        status = 'PVP'
 
             board.draw(screen, status)
             if status == "start":
@@ -99,6 +126,11 @@ def main():
                 else:
                     pygame.draw.rect(screen, red, (300, 125, 75, 50), 2)
 
+                if at_PVP:
+                    pygame.draw.rect(screen, red, (300, 185, 75, 50), 0)
+                else:
+                    pygame.draw.rect(screen, red, (300, 185, 75, 50), 2)
+                
                 if pvc:
                     pygame.draw.rect(screen, green, (240, 40, 80, 40), 2)
                     pygame.draw.rect(screen, red, (350, 40, 80, 40), 2)
@@ -118,6 +150,7 @@ def main():
                 screen.blit(text_start, button_start)
                 screen.blit(text_PVC, button_PVC)
                 screen.blit(text_CVC, button_CVC)
+                screen.blit(text_PVP, button_PVP)
 
         # 遊戲進行
         elif status == "run":
@@ -168,7 +201,119 @@ def main():
 
             screen.blit(text_restart, button_restart)
             screen.blit(text_quit, button_quit)
-
+            
+        # 選擇passive還是active畫面
+        elif status == 'PVP':
+            # s = connect_server()
+            if sub_status == 'choose online mode':
+                for event in pygame.event.get():
+                    x, y = pygame.mouse.get_pos()
+                    # 判斷滑鼠是否移動到restart按鈕上
+                    if button_passive.collidepoint((x, y)):
+                        pygame.draw.rect(screen, red, (button_passive.left, button_passive.top, button_passive.width, button_passive.height), 0)
+                    else:
+                        pygame.draw.rect(screen, black, (button_passive.left, button_passive.top, button_passive.width, button_passive.height), 0)
+                        
+                    if button_active.collidepoint((x, y)):
+                        pygame.draw.rect(screen, red, (button_active.left, button_active.top, button_active.width, button_active.height), 0)
+                    else:
+                        pygame.draw.rect(screen, black, (button_active.left, button_active.top, button_active.width, button_active.height), 0)
+                        
+                    screen.blit(text_passive, button_passive)
+                    screen.blit(text_active, button_active)
+                    
+                    if event.type == QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    elif event.type == MOUSEBUTTONDOWN:
+                        if button_passive.collidepoint((x, y)):
+                            sub_status = 'input name'
+                            passive = True
+                            screen.fill(black)
+                        if button_active.collidepoint((x, y)):
+                            sub_status = 'input name'
+                            passive = False
+                            screen.fill(black)
+                            
+                            
+            elif sub_status == 'input name':
+                
+                for event in pygame.event.get():
+                    x, y = pygame.mouse.get_pos()
+                    if event.type == QUIT:
+                        pygame.quit()
+                        sys.exit()
+                        
+                        # 判斷滑鼠是否移動到restart按鈕上
+                    elif at_input and event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_BACKSPACE:
+                            user_name = user_name[:-1]
+                        elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                            mode = 'passive' if passive else 'active'
+                            s = connect_server()
+                            if register_name(user_name, mode, s):
+                                sub_status = 'online list'
+                                screen.fill(black)
+                                break
+                            else:
+                                print('Internal Server Error')
+                                pygame.quit()
+                                sys.exit()
+                        else:
+                            user_name += event.unicode
+                                
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        if name_input_box.collidepoint((x, y)):
+                            at_input = True
+                            color = white
+                        else:
+                            at_input = False
+                            color = (100, 100, 100)
+                    title_text = large_font.render('Please input your name', True, white)
+                    remind_text = small_font.render('Press Enter to continue', True, white)
+                    name = large_font.render(user_name, True, black)
+                    
+                    title_rect = title_text.get_rect(center=(name_input_box.centerx, name_input_box.centery-50))
+                    remind_rect = remind_text.get_rect(center=(name_input_box.centerx, name_input_box.centery+50))
+                    pygame.draw.rect(screen, color, name_input_box)
+                    
+                    
+                    screen.blit(remind_text, remind_rect)
+                    screen.blit(title_text, title_rect)
+                    screen.blit(name, (name_input_box.x+5, name_input_box.y+5))
+                    
+            elif sub_status == 'online list':
+                for event in pygame.event.get():
+                    x, y = pygame.mouse.get_pos()
+                    
+                    if event.type == QUIT:
+                        s.close()
+                        pygame.quit()
+                        sys.exit()
+                    if passive:
+                        # render waiting
+                        waiting_text = large_font.render('Wait for opponent...', True, white)
+                        waiting_rect = waiting_text.get_rect(center=(220, 220))
+                        screen.blit(waiting_text, waiting_rect)
+                        #
+                    else: 
+                        # render online list
+                        online_list = request_online_list(s)
+                        if online_list != -1:
+                            for idx, name in enumerate(online_list):
+                                user_text = small_font.render(name, True, white)
+                                user_rect = user_text.get_rect(center=(220, 50*(idx+1)))
+                                
+                                if user_rect.collidepoint((x, y)):
+                                    pygame.draw.rect(screen, green, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 2)
+                                else:
+                                    pygame.draw.rect(screen, black, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 0)
+                                    
+                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                    if user_rect.collidepoint((x, y)) :
+                                        print(name)
+                                screen.blit(user_text, user_rect)
+                        
         pygame.display.update()
         main_clock.tick(60)
 
