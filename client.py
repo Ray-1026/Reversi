@@ -15,8 +15,32 @@ def register_name(name, mode, s):
     time.sleep(0.5)    
     s.sendall(mode.encode())
     data = s.recv(1024)
-    print(data)
-    return data == b'Connected'
+    if data == b'Connected':
+        # s.sendall(b'OK')
+        if mode == "active":
+            data = s.recv(8192)
+            print(pickle.loads(data))
+            while True:
+                oppo = input()
+                s.sendall(oppo.encode('utf-8'))
+                data = s.recv(8192).decode('utf-8')
+                print(data)
+                if data != "This user not available":
+                    break
+        elif mode == "passive":
+            while True:
+                data = s.recv(8192).decode('utf-8')
+                print(data)
+                if data.startswith("req"):
+                    confirm = input()
+                    s.sendall(confirm.encode('utf-8'))
+                    break
+            
+        while True:
+            color = s.recv(8192).decode('utf-8')
+            if color == "Black" or color == "White":
+                print("Start")
+                break
 
 def request_online_list(s):
     s.sendall('online_list'.encode())
