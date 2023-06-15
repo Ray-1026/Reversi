@@ -45,6 +45,7 @@ def handle_match(client1, client2, client1_name, client2_name, first_macth):
 
 
 def handle_client(client_conn, client_addr):
+
     global client_dict, match_list
     client_name = client_conn.recv(MSG_SIZE).decode('utf-8')
 
@@ -63,9 +64,17 @@ def handle_client(client_conn, client_addr):
         time.sleep(1000000)
     elif mode == "active":
         client_conn.sendall('Connected'.encode('utf-8'))
-        client_conn.sendall(pickle.dumps(passive_list))
+        # Refresh online list
+        while True:
+            fg = client_conn.recv(MSG_SIZE).decode('utf-8')
+            if fg == 'online_list':
+                client_conn.sendall(pickle.dumps(passive_list))
+            else:
+                break
+
         while True:
             opponent = client_conn.recv(MSG_SIZE).decode('utf-8')
+            print('recieving opponent')
             if opponent not in passive_list:
                 client_conn.sendall('This user not available'.encode('utf-8'))
             else:
@@ -89,7 +98,6 @@ def handle_client(client_conn, client_addr):
         return
 
     # Start a match
-    
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -99,6 +107,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print("Reversi server is running...")
 
     while True:
-        conn, addr = s.accept()
+        conn, addr = s.accept()        
         threading.Thread(target=handle_client, args=(conn, addr)).start()
         
