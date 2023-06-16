@@ -49,7 +49,7 @@ class GameLogic:
         --------------------------------------------------------
         """
         self.cur_agent = self.agent1 if self.agent1.side == "black" else self.agent2  # 紀錄目前輪到哪個玩家
-        while not utils.noMoreMove(self.board.board):
+        while not utils.noMoreMove(self.board.board): # 當還有位置下
             pos = None  # 下棋的位置
 
             # 事件監聽

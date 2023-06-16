@@ -81,7 +81,7 @@ class Agent:
             # 下在(x, y)的位置，並選擇分數最高的
             copyBoard = utils.getBoardCopy(board) 
             utils.flip(copyBoard, self.opponentSide, x, y)
-            score = utils.getScore(copyBoard)[self.opponentSide]
+            score = '''TODO: 得到目前棋面的分數'''
             if score > bestScore:
                 bestMove = [x, y]
                 bestScore = score
