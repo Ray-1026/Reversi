@@ -154,7 +154,7 @@ class Board:
                 winner = "tie"
 
             if winner != "tie":
-                message = str(winner) + "Win"
+                message = str(winner) + " Win"
             else:
                 message = "Tie"
 
