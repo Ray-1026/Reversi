@@ -20,8 +20,38 @@ def register_name(name, mode, s):
 
 def request_online_list(s):
     s.sendall('online_list'.encode())
+    online_list = s.recv(8192)
+    
+    return pickle.loads(online_list) 
+
+def send_opponent(s, opponent):
+    s.sendall(opponent.encode())
+    s.sendall(opponent.encode())
     try:
-        online_list = s.recv(8192)
+        data = s.recv(8192).decode('utf-8')
     except:
         return -1
-    return pickle.loads(online_list) 
+    return data
+
+def passive_recv_req(s):
+    data = s.recv(8192).decode('utf-8')
+    return data[4:] if data.startswith('req') else -1
+
+def active_req_ok(s):
+    data = s.recv(8192).decode('utf-8')
+    return data == 'OK'
+
+def passive_send_ok(s):
+    s.sendall('OK'.encode())
+    
+def get_game_order(s):
+    data = s.recv(8159).decode('utf-8')
+    print(data)
+    if 'white' in data or 'black' in data:
+        return data
+    else:
+        return -1
+
+def disconnect(s):
+    s.sendall('disconnect'.encode())
+    s.close()
