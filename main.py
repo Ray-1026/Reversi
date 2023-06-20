@@ -17,7 +17,6 @@ def main():
     pygame.init()
     main_clock = pygame.time.Clock()
     board = Board()
-    # s = connect_server()
 
     # 模式設定
     pvc = True

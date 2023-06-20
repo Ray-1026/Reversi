@@ -17,6 +17,21 @@ opponent_dict = {} # key: name, value: opponent name
 match_result = {} # key: (name1, name2), value: result
 
 
+def sending_trash(conn):
+    while True:
+        conn.send(' '.encode())
+        time.sleep(1)
+
+def handle_disconnect(conn, addr):
+    while True:
+        try:
+            data = conn.recv(8192).decode('utf-8')
+        except:
+            continue
+        if 'disconnect' in data:
+            print(f'{addr} disconnected')
+            
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
