@@ -2,13 +2,17 @@ import socket
 import threading
 import pickle
 import time
+import select
+
 
 HOST = ''
 PORT = 8080
 MSG_SIZE = 8192
 TIMEOUT = 100
+SLEEP_TIME = 0.5
 
-client_dict = {} # key: name, value: (socket, addr)
+client_name_dict = {} # key: name, value: socket
+client_sock_dict = {} # key: socket, value: name
 passive_list = [] # List of clients who are waiting for opponent
 match_list = [] # Use tuple to represent a match
 
@@ -64,7 +68,7 @@ def handle_client(client_conn, client_addr):
         client_conn.sendall('Connected'.encode('utf-8'))
         passive_list.append(client_name)
         threading.Thread(target=sending_trash, args=[client_conn]).start()    
-        time.sleep(1000000)
+        # time.sleep(1000000)
         
     elif mode == "active":
         client_conn.sendall('Connected'.encode('utf-8'))
@@ -157,6 +161,7 @@ def handle_client(client_conn, client_addr):
 
     # Start a match
 
+
 def sending_trash(conn):
     while True:
         conn.send(' '.encode())
@@ -175,10 +180,63 @@ def handle_disconnect(conn, addr):
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
-    # s.setblocking(False)
     s.listen(40) # Up to 40 clients
     print("Reversi server is running...")
+    socket_list = [s]
+
     while True:
-        conn, addr = s.accept()
-        threading.Thread(target=handle_client, args=(conn, addr)).start()
-        
+        connections, _, _ = select.select(socket_list, [], [])
+        for sock in connections:
+            if sock is s:
+                conn, addr = s.accept()
+                socket_list.append(conn) 
+            else:
+                content = sock.recv(MSG_SIZE).decode('utf-8')
+                content = content.split('#')
+                print(content)
+                if content[0] == 'disconnect':
+                    sock.close()
+                    socket_list.remove(sock)
+                    name = client_sock_dict[sock]
+                    del client_name_dict[name]
+                    del client_sock_dict[sock]
+                
+                elif content[0] == 'register':
+                    client_name = content[1]
+                    client_mode = content[2]
+                    if client_name in client_name_dict:
+                        sock.sendall('Name already exists'.encode('utf-8'))
+                        sock.close()
+                        continue
+                        
+                    client_name_dict[client_name] = sock
+                    client_sock_dict[sock] = client_name
+                    print(f'Client {client_name} connected')
+                    sock.sendall('Connected'.encode('utf-8'))
+                    if client_mode == 'passive':
+                        passive_list.append(client_name)
+                        
+                elif content[0] == 'online_list':
+                    sock.sendall(pickle.dumps(passive_list))
+                    
+                
+                elif content[0] == 'active_req':
+                    opponent = content[1]
+                    passive_list.remove(opponent)
+                    client_name_dict[opponent].sendall(f'req {client_sock_dict[sock]}'.encode())
+                    
+                
+                elif content[0] == 'passive_confirm':
+                    opponent = content[1]
+                    client_name_dict[opponent].sendall('OK'.encode())
+                    
+                    
+                elif content[0] == 'game_order':
+                    first_game = True if content[1] == 'first' else False
+                    passive = True if content[2] == 'passive' else False
+                    game_order = 'black' if (first_game and not passive) or (not first_game and passive) else 'white'
+                    sock.sendall(game_order.encode())
+                    
+                elif content[0] == 'no_event':
+                    sock.sendall('fuck_you'.encode())
+                    
