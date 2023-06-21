@@ -79,7 +79,7 @@ class Agent:
                 return [x, y]
 
             # 下在(x, y)的位置，並選擇分數最高的
-            copyBoard = utils.getBoardCopy(board)
+            copyBoard = utils.getBoardCopy(board) 
             utils.flip(copyBoard, self.opponentSide, x, y)
             score = utils.getScore(copyBoard)[self.opponentSide]
             if score > bestScore:

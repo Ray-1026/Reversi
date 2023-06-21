@@ -22,7 +22,7 @@ class PlayerAgent(Agent):
         - opponentSide : 對手的棋子顏色
         --------------------------------------------------------
         """
-        super().__init__(side)
+        super().__init__(side) # 繼承agent
         self.name = "human"
 
     def choose(self, board, valid_moves):

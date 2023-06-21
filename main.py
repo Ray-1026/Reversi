@@ -3,6 +3,8 @@ from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from gamelogic import GameLogic, pygame
 from board import Board
 from agent import Agent
+from player import PlayerAgent
+
 # from player import PlayerAgent
 from client import *
 
