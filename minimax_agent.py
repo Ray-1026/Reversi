@@ -38,7 +38,7 @@ class Agent:
                     score -= 1
         return score
     
-    def minimax(self, board, depth, maximized):
+    def minimax(self, board, depth, maximized, alpha, beta):
         if depth == 0 or self.game.getValidMoves(board, self.game.computerTile) == 0:
             return self.evaluate(board), None
         if maximized:
@@ -47,13 +47,16 @@ class Agent:
             for x, y in self.game.getValidMoves(board, self.game.computerTile):
                 copyBoard = self.getBoardCopy(board)
                 self.game.makeMove(copyBoard, self.game.computerTile, x, y)
+                child_score, m = self.minimax(copyBoard, depth-1, False, alpha, beta)
+                
                 # START YOUR CODE #
-                # val = max(val, self.minimax(copyBoard, depth-1, False))
-                tmp, m = self.minimax(copyBoard, depth-1, False)
-                if tmp > val:
-                    val = tmp
-                    move = (x, y)
+                if child_score>val :
+                    val=child_score
+                    move=m 
                 # END YOUR CODE #
+                if val>=beta :
+                    break
+                alpha=max(alpha, val)
             return val, move
         else:
             val = 100000
@@ -61,12 +64,15 @@ class Agent:
             for x, y in self.game.getValidMoves(board, self.game.playerTile):
                 copyBoard = self.getBoardCopy(board)
                 self.game.makeMove(copyBoard, self.game.playerTile, x, y)
-                # START YOUR CODE #
-                tmp, m = self.minimax(copyBoard, depth-1, False)
-                if tmp < val:
-                    val = tmp
-                    move = (x, y)
+                child_score, m = self.minimax(copyBoard, depth-1, False, alpha, beta)           
+                # START YOUR CODE #s
+                if child_score<val :
+                    val=child_score
+                    move=m
                 # END YOUR CODE #
+                if val<=alpha :
+                    break
+                beta=min(beta, val)
             return val, move
 
     def choose(self, board):
