@@ -17,6 +17,7 @@ opponent_dict = {} # key: name, value: opponent name
 match_result = {} # key: (name1, name2), value: result
 
 
+
 def sending_trash(conn):
     while True:
         conn.send(' '.encode())
