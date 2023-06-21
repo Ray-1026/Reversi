@@ -400,7 +400,6 @@ def main():
                     screen.blit(setup_text, setup_rect)
                     if game_order != -1:
                         agent = Agent(game_order)
-                        print(agent)
                         status = 'PVP run'
                         screen.fill(black)
                         break
