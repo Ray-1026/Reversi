@@ -3,7 +3,8 @@ import utils
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from gamelogic import GameLogic, pygame
 from board import Board
-from agent import Agent
+from minimax_agent import Agent
+from alpha_zero_agent import AlphaZeroAgent
 from player import PlayerAgent
 from remote_agent import RemoteAgent
 # from player import PlayerAgent
