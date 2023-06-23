@@ -2,7 +2,8 @@ import sys
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from gamelogic import GameLogic, pygame
 from board import Board
-from agent import Agent
+from minimax_agent import Agent
+from alpha_zero_agent import AlphaZeroAgent
 from player import PlayerAgent
 
 # from player import PlayerAgent
@@ -103,7 +104,7 @@ def main():
                             agent2 = Agent("white" if chooseSide == "black" else "black")  # 電腦
                         else:  # 選擇CVC模式
                             agent1 = Agent("white")  # 1號電腦
-                            agent2 = Agent("black")  # 2號電腦
+                            agent2 = AlphaZeroAgent("black")  # 2號電腦
                         game = GameLogic(agent1, agent2, screen)
                         pygame.time.delay(750)
                     elif 240 <= x and x <= 320 and 40 <= y and y <= 80:  # 按下PVC模式
