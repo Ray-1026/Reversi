@@ -89,10 +89,10 @@ class Board:
                 self.board[x][y] = "none"
 
         # 在棋盤中間放上黑白各兩子
-        self.board[3][3] = "black"
-        self.board[3][4] = "white"
-        self.board[4][3] = "white"
-        self.board[4][4] = "black"
+        self.board[3][3] = "white"
+        self.board[3][4] = "black"
+        self.board[4][3] = "black"
+        self.board[4][4] = "white"
 
     def draw(self, screen, status, game=None):
         """
