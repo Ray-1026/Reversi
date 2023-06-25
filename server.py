@@ -3,7 +3,7 @@ import threading
 import pickle
 import time
 import select
-
+from client import packing
 
 HOST = ''
 PORT = 8080
@@ -15,6 +15,8 @@ client_name_dict = {} # key: name, value: socket
 client_sock_dict = {} # key: socket, value: name
 passive_list = [] # List of clients who are waiting for opponent
 match_list = [] # Use tuple to represent a match
+opponent_dict = {} # key: name, value: opponent name
+match_result = {} # key: (name1, name2), value: result
 
 def handle_match(client1, client2, client1_name, client2_name, first_macth):
     if first_macth:
@@ -227,16 +229,45 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     
                 
                 elif content[0] == 'passive_confirm':
-                    opponent = content[1]
+                    passive_player = content[1]
+                    opponent = content[2]
+                    opponent_dict[opponent] = passive_player
+                    opponent_dict[passive_player] = opponent
                     client_name_dict[opponent].sendall('OK'.encode())
-                    
                     
                 elif content[0] == 'game_order':
                     first_game = True if content[1] == 'first' else False
                     passive = True if content[2] == 'passive' else False
                     game_order = 'black' if (first_game and not passive) or (not first_game and passive) else 'white'
                     sock.sendall(game_order.encode())
+                
+                elif content[0] == 'play':
+                    name = content[1]
+                    client_name_dict[opponent_dict[name]].sendall(packing(["play", content[2], content[3]]))
                     
                 elif content[0] == 'no_event':
                     sock.sendall('fuck_you'.encode())
-                    
+                
+                elif content[0] == 'END1':
+                    name = content[1]
+                    opponent = opponent_dict[name]
+                    match = (max(name, opponent), min(name, opponent))
+                    if name == match[0]:
+                        match_result[match] = {
+                            name: int(content[2]),
+                            opponent: int(content[3])
+                        }
+                elif content[0] == 'END2':
+                    name = content[1]
+                    opponent = opponent_dict[name]
+                    match = (max(name, opponent), min(name, opponent))
+                    if name == match[0]:
+                        match_result[match][name] += int(content[2])
+                        match_result[match][opponent] += int(content[3])
+                        sock.sendall(pickle.dumps(match_result[match]))
+                        client_name_dict[opponent].sendall(pickle.dumps(match_result[match]))
+                elif content[0] == 'OK':
+                    name = content[1]
+                    client_name_dict[opponent_dict[name]].sendall('OK'.encode())
+
+                

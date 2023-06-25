@@ -45,8 +45,8 @@ def active_req_ok(s):
     data = s.recv(8192).decode('utf-8')
     return data == 'OK'
 
-def passive_send_ok(s, opponent):
-    content = packing(['passive_confirm', opponent])
+def passive_send_ok(s, name, opponent):
+    content = packing(['passive_confirm', name, opponent])
     s.sendall(content)
     
 def get_game_order(s, first_game, passive):
@@ -54,8 +54,8 @@ def get_game_order(s, first_game, passive):
     mode = 'passive' if passive else 'active'
     content = packing(['game_order', game_cnt, mode])
     s.sendall(content)
-    data = s.recv(8159).decode('utf-8')
-    print(data)
+    data = s.recv(1024).decode('utf-8')
+    print(data, "receive")
     if data == 'white' or data == 'black':
         return data
     else:
@@ -78,4 +78,7 @@ def start_sending_trash(s):
     Thread(target=sending_trash, args=(s, event)).start()
 def stop_sending_trash():
     event.set()
-    
+
+def send_move(s, move: list, username):
+    content = packing(['play', username, str(move[0]), str(move[1])])
+    s.sendall(content)

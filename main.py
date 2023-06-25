@@ -1,10 +1,11 @@
 import sys
+import utils
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from gamelogic import GameLogic, pygame
 from board import Board
 from agent import Agent
 from player import PlayerAgent
-
+from remote_agent import RemoteAgent
 # from player import PlayerAgent
 from client import *
 
@@ -22,6 +23,7 @@ def main():
     passive = True
     user_name = ''
     at_input = True
+    
     color = (255, 255, 255)
     chooseSide = "black"
     status = "start"
@@ -381,7 +383,7 @@ def main():
                     # send ok request
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if ok_rect.collidepoint((x, y)):
-                            passive_send_ok(s, opponent)
+                            passive_send_ok(s, user_name, opponent)
                             screen.fill(black)
                             sub_status = 'setup pvp game'
                             break
@@ -392,27 +394,96 @@ def main():
                     if event.type == QUIT:
                         pygame.quit()
                         sys.exit()
-                        
+                    
                     game_order = get_game_order(s, True, passive)
                     setup_text = large_font.render('Loading...', True, white)
                     setup_rect = setup_text.get_rect(center=(220, 220))
                     
                     screen.blit(setup_text, setup_rect)
                     if game_order != -1:
-                        agent = Agent(game_order)
-                        status = 'PVP run'
+                        status = 'PVP run 1'
                         screen.fill(black)
                         break
                     
-        elif status == 'PVP run':
+        elif status == 'PVP run 1':
             for event in pygame.event.get():
                 if event.type == QUIT:
                     disconnect(s)
                     pygame.quit()
                     sys.exit()
-                
+            agent1 = PlayerAgent(game_order)
+            agent2 = RemoteAgent("white" if game_order == "black" else "black")
+            game = GameLogic(agent1, agent2, screen, s, user_name)
+            game.run(screen, main_clock)
+            status = "PVP end run 1"
+        elif status == "PVP end run 1":
+            print("end pvp run 1")
+            score = utils.getScore(game.board.board)
+            s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
+            time.sleep(1)
+            game_order = get_game_order(s, False, passive)
+            print(game_order, "game_order")
+            time.sleep(0.5)
+            s.sendall(packing(["OK", user_name]))
+            data = s.recv(1024).decode('utf-8')
+            print("start game 2", data)
+            if data == "OK":
+                status = "PVP run 2"
+                screen.fill(black)
+        elif status == "PVP run 2":
+            agent1 = PlayerAgent(game_order)
+            agent2 = RemoteAgent("white" if game_order == "black" else "black")
+            game = GameLogic(agent1, agent2, screen, s, user_name)
+            game.run(screen, main_clock)
+            status = "PVP end run 2"
+            score = utils.getScore(game.board.board)
+            s.sendall(packing(["END2", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
+            data = s.recv(2048)
+            results = pickle.loads(data)
+        elif status == "PVP end run 2":
+            for event in pygame.event.get():
+                # 取得滑鼠游標位置
+                x, y = pygame.mouse.get_pos()
 
-                        
+                # 判斷滑鼠是否移動到restart按鈕上
+                if 90 <= x and x <= 170 and 280 <= y and y <= 320:
+                    at_restart = True
+                else:
+                    at_restart = False
+
+                # 判斷滑鼠是否移動到restart按鈕上
+                if 270 <= x and x <= 350 and 280 <= y and y <= 320:
+                    at_quit = True
+                else:
+                    at_quit = False
+
+                # 判斷按下Restart、Quit或關閉視窗
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == MOUSEBUTTONDOWN:
+                    if 90 <= x and x <= 170 and 280 <= y and y <= 320:  # 按下restart
+                        status = "start"
+                        at_quit = False
+                        at_restart = False
+                    elif 270 <= x and x <= 350 and 280 <= y and y <= 320:  # 按下Quit
+                        pygame.quit()
+                        sys.exit()
+            board.draw(screen, "end pvp", game, user_name, results)
+            if at_restart:
+                pygame.draw.rect(screen, red, (90, 280, 80, 40), 0)
+            else:
+                pygame.draw.rect(screen, white, (90, 280, 80, 40), 2)
+
+            if at_quit:
+                pygame.draw.rect(screen, red, (270, 280, 80, 40), 0)
+            else:
+                pygame.draw.rect(screen, white, (270, 280, 80, 40), 2)
+
+            screen.blit(text_restart, button_restart)
+            screen.blit(text_quit, button_quit)
+
+                
         pygame.display.update()
         main_clock.tick(60)
     

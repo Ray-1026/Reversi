@@ -1,12 +1,14 @@
 import pygame
 import utils
 import sys
+import pickle
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from board import Board
 
+from client import send_move
 
 class GameLogic:
-    def __init__(self, agent1, agent2, screen):
+    def __init__(self, agent1, agent2, screen, sock=None, username=None):
         """
         --------------------------------------------------------
         #### 物件 : 遊戲邏輯
@@ -33,6 +35,8 @@ class GameLogic:
         self.board = Board()
         self.screen = screen
         self.last_move = None
+        self.sock = sock
+        self.username = username
         self.direct = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]
 
     def run(self, screen, main_clock):
@@ -51,7 +55,7 @@ class GameLogic:
         self.cur_agent = self.agent1 if self.agent1.side == "black" else self.agent2  # 紀錄目前輪到哪個玩家
         while not utils.noMoreMove(self.board.board): # 當還有位置下
             pos = None  # 下棋的位置
-
+            # print(self.cur_agent.side, self.cur_agent.name)
             # 事件監聽
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -63,11 +67,15 @@ class GameLogic:
             # 如果目前輪到電腦，直接呼叫choose()函式決定下的位置
             if self.cur_agent.name == "agent":
                 pos = self.cur_agent.choose(self.board.board, utils.getValidMoves(self.board.board, self.cur_agent.side))
-
-            if pos or self.cur_agent.name == "agent":
+            elif self.cur_agent.name == "remote":
+                pos = self.cur_agent.choose(self.sock)
+        
+            if pos:
                 if utils.isValidMove(self.board.board, self.cur_agent.side, pos[0], pos[1]):  # 如果pos的位置可以下
                     utils.flip(self.board.board, self.cur_agent.side, pos[0], pos[1])  # 翻轉棋子
                     self.last_move = [pos[0], pos[1]]  # 更新last_move
+                    if self.sock is not None and self.cur_agent.name != "remote":
+                        send_move(self.sock, pos, self.username)
 
                 # 判斷下回合是否要交換玩家
                 if utils.getValidMoves(self.board.board, self.cur_agent.opponentSide):
