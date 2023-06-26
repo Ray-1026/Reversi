@@ -24,6 +24,14 @@ def main():
     user_name = ''
     at_input = True
     name_exist = False
+
+    # 玩家設定
+
+    PVCAgent = Agent
+    CVCAgent1 = Agent
+    CVCAgent2 = Agent
+    PVPAgent = PlayerAgent
+
     
     color = (255, 255, 255)
     chooseSide = "black"
@@ -103,10 +111,10 @@ def main():
                         status = "run"
                         if pvc:  # 選擇PVC模式
                             agent1 = PlayerAgent(chooseSide)  # 玩家
-                            agent2 = Agent("white" if chooseSide == "black" else "black")  # 電腦
+                            agent2 = PVCAgent("white" if chooseSide == "black" else "black")  # 電腦
                         else:  # 選擇CVC模式
-                            agent1 = Agent("white")  # 1號電腦
-                            agent2 = Agent("black")  # 2號電腦
+                            agent1 = CVCAgent1("white")  # 1號電腦
+                            agent2 = CVCAgent2("black")  # 2號電腦
                         game = GameLogic(agent1, agent2, screen)
                         pygame.time.delay(750)
                     elif 240 <= x and x <= 320 and 40 <= y and y <= 80:  # 按下PVC模式
@@ -416,7 +424,7 @@ def main():
                     disconnect(s)
                     pygame.quit()
                     sys.exit()
-            agent1 = Agent(game_order)
+            agent1 = PVPAgent(game_order)
             agent2 = RemoteAgent("white" if game_order == "black" else "black")
             game = GameLogic(agent1, agent2, screen, s, user_name)
             disconnect_fg = game.run(screen, main_clock)
@@ -444,7 +452,7 @@ def main():
                 screen.fill(black)
                 
         elif status == "PVP run 2":
-            agent1 = Agent(game_order)
+            agent1 = PVPAgent(game_order)
             agent2 = RemoteAgent("white" if game_order == "black" else "black")
             game = GameLogic(agent1, agent2, screen, s, user_name)
             disconnect_fg = game.run(screen, main_clock)
