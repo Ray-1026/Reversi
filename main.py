@@ -33,7 +33,7 @@ def main():
     PVCAgent = MinimaxAgent
     CVCAgent1 = MinimaxAgent
     CVCAgent2 = AlphaZeroAgent
-    PVPAgent = PlayerAgent
+    PVPAgent = Agent
 
     
     color = (255, 255, 255)
@@ -418,8 +418,14 @@ def main():
                     
                     screen.blit(setup_text, setup_rect)
                     if game_order != -1:
-                        status = 'PVP run 1'
-                        screen.fill(black)
+                        while True:
+                            s.sendall(packing(["OK", user_name]))
+                            data = s.recv(1024).decode('utf-8')
+                            print("start game 1", data)
+                            if data == "OK":
+                                status = "PVP run 1"
+                                screen.fill(black)
+                                break
                         break
                     
         elif status == 'PVP run 1':
@@ -428,6 +434,8 @@ def main():
                     disconnect(s)
                     pygame.quit()
                     sys.exit()
+            print("start pvp run 1", game_order)
+            s.sendall(packing(["OK", user_name]))
             agent1 = PVPAgent(game_order)
             agent2 = RemoteAgent("white" if game_order == "black" else "black")
             game = GameLogic(agent1, agent2, screen, s, user_name)
@@ -442,18 +450,19 @@ def main():
                 
         elif status == "PVP end run 1":
             print("end pvp run 1")
-            score = utils.getScore(game.board.board)
-            s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
-            time.sleep(1)
+            if game_order != -1:
+                score = utils.getScore(game.board.board)
+                s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
             game_order = get_game_order(s, False, passive)
-            print(game_order, "game_order")
-            time.sleep(0.5)
-            s.sendall(packing(["OK", user_name]))
-            data = s.recv(1024).decode('utf-8')
-            print("start game 2", data)
-            if data == "OK":
-                status = "PVP run 2"
-                screen.fill(black)
+            if game_order != -1:
+                print(game_order, "game_order")
+                time.sleep(0.5)
+                s.sendall(packing(["OK", user_name]))
+                data = s.recv(1024).decode('utf-8')
+                print("start game 2", data)
+                if "OK" in data:
+                    status = "PVP run 2"
+                    screen.fill(black)
                 
         elif status == "PVP run 2":
             agent1 = PVPAgent(game_order)

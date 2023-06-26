@@ -58,7 +58,7 @@ class GameLogic:
             pos = None  # 下棋的位置
             # print(self.cur_agent.side, self.cur_agent.name)
             # 事件監聽
-            if screen:
+            if screen is not None:
                 for event in pygame.event.get():
                     if event.type == QUIT:
                         if self.sock is not None:
@@ -84,17 +84,18 @@ class GameLogic:
                 # 判斷下回合是否要交換玩家
                 if utils.getValidMoves(self.board.board, self.cur_agent.opponentSide):
                     self.cur_agent = self.agent2 if self.cur_agent == self.agent1 else self.agent1
+                else:
+                    time.sleep(0.25)
             
             elif pos == -1:
                 disconnect(self.sock)
                 return 'running_disconnect'
             
-            if screen:
+            if screen is not None:
                 self.board.draw(screen, "run", self)
                 pygame.display.update()
                 main_clock.tick(60)
-            else:
-                time.sleep(0.25)
+
         if screen:
             pygame.time.delay(1000)  # 停留在結果畫面1秒
         return 'end game'

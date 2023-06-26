@@ -50,9 +50,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             else:
                 content = sock.recv(MSG_SIZE).decode('utf-8')
                 content = content.split('#')
-                print(content)
+                if content != [""]: print(content)
                 if content[0] == 'disconnect':
-                    
                     # disconnect while running game
                     if len(content) > 1:
                         name = content[1]
@@ -95,7 +94,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     opponent = content[2]
                     opponent_dict[opponent] = passive_player
                     opponent_dict[passive_player] = opponent
-                    client_name_dict[opponent].sendall('OK'.encode())
+                    client_name_dict[opponent].sendall('agree'.encode())
                     
                 elif content[0] == 'game_order':
                     first_game = True if content[1] == 'first' else False
@@ -130,6 +129,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         client_name_dict[opponent].sendall(pickle.dumps(match_result[match]))
                 elif content[0] == 'OK':
                     name = content[1]
+                    print(name, opponent_dict[name])
                     client_name_dict[opponent_dict[name]].sendall('OK'.encode())
 
                 

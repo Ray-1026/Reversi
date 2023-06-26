@@ -6,7 +6,8 @@ from threading import Event, Thread
 
 SLEEP_TIME = 0.1
 event = Event()
-HOST = 'reversi.jayinnn.dev'    # The remote host
+# HOST = 'reversi.jayinnn.dev'    # The remote host
+HOST = ''
 PORT = 8080             # The same port as used by the server
 
 def packing(things: list):
@@ -41,7 +42,7 @@ def passive_recv_req(s):
 
 def active_req_ok(s):
     data = s.recv(8192).decode('utf-8')
-    return data == 'OK'
+    return data == 'agree'
 
 def passive_send_ok(s, name, opponent):
     content = packing(['passive_confirm', name, opponent])

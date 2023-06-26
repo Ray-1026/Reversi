@@ -4,6 +4,10 @@ import random
 import string
 import time
 import utils
+import multiprocessing
+
+from multiprocessing import Process
+
 
 from gamelogic import GameLogic
 from board import Board
@@ -20,7 +24,6 @@ def random_name():
 
 def main(args):
     PVPAgent = eval(args.agent)
-    passive = True
     user_name = f"{args.agent}_{random_name()}"
 
     s = connect_server()
@@ -39,17 +42,26 @@ def main(args):
             stop_sending_trash()
             break
     print(opponent)
-    passive_send_ok(s, user_name, opponent)
-    game_order = get_game_order(s, True, passive)
-    if game_order == -1:
-        print("error")
-        running_disconnect(s, user_name)
-        exit(1)
+    while True:
+        passive_send_ok(s, user_name, opponent)
+        game_order = get_game_order(s, True, True)
+        if game_order != -1:
+            s.sendall(packing(["OK", user_name]))
+            while True:
+                data = s.recv(1024).decode('utf-8')
+                print("start game 1", data)
+                if data == "OK":
+                    break
+            break
+        
+    print(game_order, "game_order")
+    time.sleep(0.5)
+    s.sendall(packing(["OK", user_name]))
     # Start PVP Game 1
     agent1 = PVPAgent(game_order)
     agent2 = RemoteAgent("white" if game_order == "black" else "black")
     game = GameLogic(agent1, agent2, None, s, user_name)
-    time.sleep(1)
+    time.sleep(0.25)
     disconnect_fg = game.run(None, None)
     if disconnect_fg == 'running_disconnect':
         print("running_disconnect")
@@ -58,18 +70,24 @@ def main(args):
     
     score = utils.getScore(game.board.board)
     s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
-    time.sleep(1)
-    game_order = get_game_order(s, False, passive)
+    while True:
+        game_order = get_game_order(s, False, True)
+        if game_order != -1:
+            break
     print(game_order, "game_order")
-    time.sleep(0.5)
+    print(user_name)
+    time.sleep(2)
     s.sendall(packing(["OK", user_name]))
-    data = s.recv(1024).decode('utf-8')
-    print("start game 2", data)
-    if data != "OK":
-        print("error")
-        running_disconnect(s, user_name)
-        exit(1)
-
+    while True:
+        data = s.recv(1024).decode('utf-8')
+        print("start game 2", data)
+        if data != "OK":
+            print("error")
+            running_disconnect(s, user_name)
+            exit(1)
+        else:
+            break
+    time.sleep(1)
     agent1 = PVPAgent(game_order)
     agent2 = RemoteAgent("white" if game_order == "black" else "black")
     game = GameLogic(agent1, agent2, None, s, user_name)
@@ -92,5 +110,14 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--agent', type=str, default='Agent')
+    parser.add_argument('--num_agent', type=int, default=1)
     args = parser.parse_args()
-    main(args)
+    pool = multiprocessing.Pool(4)
+    for _ in range(args.num_agent):
+        pool.apply_async(main, args=(args,))
+
+
+    while True:
+        if pool._processes < args.num_agent:
+            pool.apply_async(main, args=(args,))
+            print(pool._processes)
