@@ -6,7 +6,7 @@ from threading import Event, Thread
 
 SLEEP_TIME = 0.1
 event = Event()
-HOST = 'localhost'    # The remote host
+HOST = 'reversi.jayinnn.dev'    # The remote host
 PORT = 8080             # The same port as used by the server
 
 def packing(things: list):
