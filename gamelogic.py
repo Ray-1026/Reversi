@@ -5,7 +5,7 @@ import pickle
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from board import Board
 
-from client import send_move
+from client import send_move, runing_disconnect, disconnect
 
 class GameLogic:
     def __init__(self, agent1, agent2, screen, sock=None, username=None):
@@ -59,6 +59,8 @@ class GameLogic:
             # 事件監聽
             for event in pygame.event.get():
                 if event.type == QUIT:
+                    if self.sock is not None:
+                        runing_disconnect(self.sock, self.username)
                     pygame.quit()
                     sys.exit()
                 elif self.cur_agent.name == "human" and event.type == MOUSEBUTTONDOWN:  # 如果目前輪到玩家且按下滑鼠左鍵
@@ -70,7 +72,7 @@ class GameLogic:
             elif self.cur_agent.name == "remote":
                 pos = self.cur_agent.choose(self.sock)
         
-            if pos:
+            if pos and pos != -1:
                 if utils.isValidMove(self.board.board, self.cur_agent.side, pos[0], pos[1]):  # 如果pos的位置可以下
                     utils.flip(self.board.board, self.cur_agent.side, pos[0], pos[1])  # 翻轉棋子
                     self.last_move = [pos[0], pos[1]]  # 更新last_move
@@ -80,10 +82,15 @@ class GameLogic:
                 # 判斷下回合是否要交換玩家
                 if utils.getValidMoves(self.board.board, self.cur_agent.opponentSide):
                     self.cur_agent = self.agent2 if self.cur_agent == self.agent1 else self.agent1
-
+            
+            elif pos == -1:
+                disconnect(self.sock)
+                return 'running_disconnect'
+            
             self.board.draw(screen, "run", self)
 
             pygame.display.update()
             main_clock.tick(60)
 
         pygame.time.delay(1000)  # 停留在結果畫面1秒
+        return 'end game'

@@ -6,7 +6,7 @@ from threading import Event, Thread
 
 SLEEP_TIME = 0.1
 event = Event()
-HOST = '127.0.0.1'    # The remote host
+HOST = 'localhost'    # The remote host
 PORT = 8080             # The same port as used by the server
 
 def packing(things: list):
@@ -18,12 +18,10 @@ def connect_server():
     return s
 
 def register_name(name, mode, s):
-    
     content = packing(['register', name, mode])
     s.sendall(content)
-    time.sleep(SLEEP_TIME)
     data = s.recv(1024).decode('utf-8')
-    return data == 'Connected'
+    return data
 
 def request_online_list(s):
     content = packing(['online_list'])
@@ -63,7 +61,8 @@ def get_game_order(s, first_game, passive):
 
 def disconnect(s):
     s.sendall('disconnect'.encode())
-    stop_sending_trash()
+    if not event.is_set():
+        stop_sending_trash()
     
 def sending_trash(s, event):
     while True:
@@ -79,6 +78,10 @@ def start_sending_trash(s):
 def stop_sending_trash():
     event.set()
 
-def send_move(s, move: list, username):
-    content = packing(['play', username, str(move[0]), str(move[1])])
+def send_move(s, move: list, user_name):
+    content = packing(['play', user_name, str(move[0]), str(move[1])])
+    s.sendall(content)
+    
+def runing_disconnect(s, user_name):
+    content = packing(['disconnect', user_name])
     s.sendall(content)

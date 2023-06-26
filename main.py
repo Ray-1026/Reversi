@@ -23,6 +23,7 @@ def main():
     passive = True
     user_name = ''
     at_input = True
+    name_exist = False
     
     color = (255, 255, 255)
     chooseSide = "black"
@@ -118,6 +119,7 @@ def main():
                         chooseSide = "white"
                     elif 300 <= x and x <= 375 and 185 <= y and y <= 235:
                         at_PVP = False
+                        s = connect_server()
                         status = 'PVP'
 
             board.draw(screen, status)
@@ -238,7 +240,6 @@ def main():
                             
                             
             elif sub_status == 'input name':
-                
                 for event in pygame.event.get():
                     x, y = pygame.mouse.get_pos()
                     if event.type == QUIT:
@@ -249,20 +250,20 @@ def main():
                     elif at_input and event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_BACKSPACE:
                             user_name = user_name[:-1]
-                        elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                        elif user_name != '' and (event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER) :
                             mode = 'passive' if passive else 'active'
-                            s = connect_server()
-                            if register_name(user_name, mode, s):
+                            name_fg = register_name(user_name, mode, s)
+                            
+                            if name_fg == 'Connected':
                                 sub_status = 'online list'
                                 if mode == 'passive':
                                     start_sending_trash(s)
                                 screen.fill(black)
+                                name_exist = False
                                 break
-                            else:
-                                print('Internal Server Error')
-                                disconnect(s)
-                                pygame.quit()
-                                sys.exit()
+                            elif name_fg == 'Name already exists':
+                                user_name = ''
+                                name_exist = True
                         else:
                             user_name += event.unicode
                                 
@@ -275,15 +276,19 @@ def main():
                             color = (100, 100, 100)
                     title_text = large_font.render('Please input your name', True, white)
                     remind_text = small_font.render('Press Enter to continue', True, white)
+                    name_exist_text = large_font.render('Name already exists', True, white)
                     name = large_font.render(user_name, True, black)
                     
                     title_rect = title_text.get_rect(center=(name_input_box.centerx, name_input_box.centery-50))
                     remind_rect = remind_text.get_rect(center=(name_input_box.centerx, name_input_box.centery+50))
+                    name_exist_rect = name_exist_text.get_rect(center=(name_input_box.centerx, name_input_box.centery+100))
                     pygame.draw.rect(screen, color, name_input_box)
                     
                     
                     screen.blit(remind_text, remind_rect)
                     screen.blit(title_text, title_rect)
+                    if name_exist:
+                        screen.blit(name_exist_text, name_exist_rect)
                     screen.blit(name, (name_input_box.x+5, name_input_box.y+5))
                     
             elif sub_status == 'online list':
@@ -411,11 +416,18 @@ def main():
                     disconnect(s)
                     pygame.quit()
                     sys.exit()
-            agent1 = PlayerAgent(game_order)
+            agent1 = Agent(game_order)
             agent2 = RemoteAgent("white" if game_order == "black" else "black")
             game = GameLogic(agent1, agent2, screen, s, user_name)
-            game.run(screen, main_clock)
-            status = "PVP end run 1"
+            disconnect_fg = game.run(screen, main_clock)
+            
+            # handle running disconnection
+            if disconnect_fg == 'running_disconnect':
+                status = 'start'
+                sub_status = 'choose online mode'
+            elif disconnect_fg == 'end game':
+                status = "PVP end run 1"
+                
         elif status == "PVP end run 1":
             print("end pvp run 1")
             score = utils.getScore(game.board.board)
@@ -430,16 +442,25 @@ def main():
             if data == "OK":
                 status = "PVP run 2"
                 screen.fill(black)
+                
         elif status == "PVP run 2":
-            agent1 = PlayerAgent(game_order)
+            agent1 = Agent(game_order)
             agent2 = RemoteAgent("white" if game_order == "black" else "black")
             game = GameLogic(agent1, agent2, screen, s, user_name)
-            game.run(screen, main_clock)
-            status = "PVP end run 2"
-            score = utils.getScore(game.board.board)
-            s.sendall(packing(["END2", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
-            data = s.recv(2048)
-            results = pickle.loads(data)
+            disconnect_fg = game.run(screen, main_clock)
+            
+            # handle running disconnection
+            if disconnect_fg == 'running_disconnect':
+                status = 'start'
+                sub_status = 'choose online mode'
+            elif disconnect_fg == 'end game':
+                status = "PVP end run 2"
+                score = utils.getScore(game.board.board)
+                s.sendall(packing(["END2", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
+                data = s.recv(2048)
+                results = pickle.loads(data)
+                disconnect(s)
+                
         elif status == "PVP end run 2":
             for event in pygame.event.get():
                 # 取得滑鼠游標位置
@@ -458,15 +479,16 @@ def main():
                     at_quit = False
 
                 # 判斷按下Restart、Quit或關閉視窗
-                if event.type == QUIT:
+                if event.type == QUIT:            
                     pygame.quit()
                     sys.exit()
                 elif event.type == MOUSEBUTTONDOWN:
-                    if 90 <= x and x <= 170 and 280 <= y and y <= 320:  # 按下restart
+                    if 90 <= x and x <= 170 and 280 <= y and y <= 320:  # 按下restart                
+                        sub_status = "choose online mode"
                         status = "start"
                         at_quit = False
                         at_restart = False
-                    elif 270 <= x and x <= 350 and 280 <= y and y <= 320:  # 按下Quit
+                    elif 270 <= x and x <= 350 and 280 <= y and y <= 320:  # 按下Quit                
                         pygame.quit()
                         sys.exit()
             board.draw(screen, "end pvp", game, user_name, results)
