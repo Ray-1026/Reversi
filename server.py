@@ -3,7 +3,7 @@ import pickle
 import select
 from client import packing
 
-HOST = ''
+HOST = '0.0.0.0'
 PORT = 8080
 MSG_SIZE = 8192
 TIMEOUT = 100
