@@ -82,6 +82,6 @@ def send_move(s, move: list, user_name):
     content = packing(['play', user_name, str(move[0]), str(move[1])])
     s.sendall(content)
     
-def runing_disconnect(s, user_name):
+def running_disconnect(s, user_name):
     content = packing(['disconnect', user_name])
     s.sendall(content)
