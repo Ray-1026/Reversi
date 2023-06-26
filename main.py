@@ -3,10 +3,13 @@ import utils
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from gamelogic import GameLogic, pygame
 from board import Board
+
+from agent import Agent
 from minimax_agent import MinimaxAgent
 from alpha_zero_agent import AlphaZeroAgent
 from player import PlayerAgent
 from remote_agent import RemoteAgent
+
 from client import *
 
 def main():
@@ -379,6 +382,7 @@ def main():
                     
             
             elif sub_status == 'passive confirm':
+
                 for event in pygame.event.get():
                     x, y = pygame.mouse.get_pos()
                     if event.type == QUIT:
