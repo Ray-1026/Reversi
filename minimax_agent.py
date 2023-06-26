@@ -1,8 +1,6 @@
 import utils
-from gamelogic import GameLogic
 
-
-class Agent:
+class MinimaxAgent:
     def __init__(self, side):
         self.side = side
         self.name = "agent"

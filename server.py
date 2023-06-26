@@ -1,6 +1,7 @@
 import socket
 import pickle
 import select
+import time
 from client import packing
 
 HOST = '0.0.0.0'

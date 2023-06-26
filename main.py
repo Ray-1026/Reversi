@@ -3,11 +3,10 @@ import utils
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from gamelogic import GameLogic, pygame
 from board import Board
-from minimax_agent import Agent
+from minimax_agent import MinimaxAgent
 from alpha_zero_agent import AlphaZeroAgent
 from player import PlayerAgent
 from remote_agent import RemoteAgent
-# from player import PlayerAgent
 from client import *
 
 def main():
@@ -28,9 +27,9 @@ def main():
 
     # 玩家設定
 
-    PVCAgent = Agent
-    CVCAgent1 = Agent
-    CVCAgent2 = Agent
+    PVCAgent = MinimaxAgent
+    CVCAgent1 = MinimaxAgent
+    CVCAgent2 = AlphaZeroAgent
     PVPAgent = PlayerAgent
 
     
