@@ -177,6 +177,6 @@ class MinimaxAgent:
         """
         用最白癡的greedy選擇最佳的走法
         """
-        _, bestMove = self.minimax(board, 5, True, float("-inf"), float("inf"))
+        _, bestMove = self.minimax(board, 4, True, float("-inf"), float("inf"))
 
         return bestMove

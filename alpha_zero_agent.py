@@ -38,7 +38,7 @@ class AlphaZeroAgent:
         self.g = OthelloGame(8)
         n1 = NNet(self.g)
         n1.load_checkpoint('./pretrained_models/othello/pytorch/','8x8_100checkpoints_best.pth.tar')
-        args1 = dotdict({'numMCTSSims': 250, 'cpuct':1.0})
+        args1 = dotdict({'numMCTSSims': 25, 'cpuct':1.0})
         self.mcts1 = MCTS(self.g, n1, args1)
 
     def convert_board(self, board):
