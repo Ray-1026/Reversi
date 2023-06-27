@@ -453,6 +453,9 @@ def main():
             if game_order != -1:
                 score = utils.getScore(game.board.board)
                 s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
+                data = s.recv(1024).decode('utf-8')
+                if data != "END1":
+                    print("end1 error")
             game_order = get_game_order(s, False, passive)
             if game_order != -1:
                 print(game_order, "game_order")

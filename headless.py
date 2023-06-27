@@ -6,7 +6,7 @@ import time
 import utils
 import multiprocessing
 
-from multiprocessing import Process
+from multiprocessing import Value, Manager
 
 
 from gamelogic import GameLogic
@@ -19,13 +19,13 @@ from remote_agent import RemoteAgent
 
 from client import *
 
+
 def random_name():
     return ''.join(random.choice(string.ascii_letters) for _ in range(3))
 
-def main(args):
+def main(args, num_process, lock):
     PVPAgent = eval(args.agent)
     user_name = f"{args.agent}_{random_name()}"
-
     s = connect_server()
 
     name_fg = register_name(user_name, 'passive', s)
@@ -40,6 +40,8 @@ def main(args):
         opponent = passive_recv_req(s)
         if opponent != -1:
             stop_sending_trash()
+            with lock:
+                num_process.value -= 1
             break
     print(opponent)
     while True:
@@ -66,10 +68,13 @@ def main(args):
     if disconnect_fg == 'running_disconnect':
         print("running_disconnect")
         running_disconnect(s, user_name)
-        exit(1)
+        return 1
     
     score = utils.getScore(game.board.board)
     s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
+    data = s.recv(1024).decode('utf-8')
+    if data != "END1":
+        print("end1 error")
     while True:
         game_order = get_game_order(s, False, True)
         if game_order != -1:
@@ -84,7 +89,7 @@ def main(args):
         if data != "OK":
             print("error")
             running_disconnect(s, user_name)
-            exit(1)
+            return 1
         else:
             break
     time.sleep(1)
@@ -95,7 +100,7 @@ def main(args):
     if disconnect_fg == 'running_disconnect':
         print("running_disconnect")
         running_disconnect(s, user_name)
-        exit(1)
+        return 1
     elif disconnect_fg == 'end game':
         score = utils.getScore(game.board.board)
         s.sendall(packing(["END2", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
@@ -106,6 +111,9 @@ def main(args):
     print("end game")
     print(results)
 
+    return 0
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -113,11 +121,12 @@ if __name__ == '__main__':
     parser.add_argument('--num_agent', type=int, default=1)
     args = parser.parse_args()
     pool = multiprocessing.Pool(4)
-    for _ in range(args.num_agent):
-        pool.apply_async(main, args=(args,))
+    manager = Manager()
+    lock = manager.Lock()
 
-
+    num_process = manager.Value('i', 0)
     while True:
-        if pool._processes < args.num_agent:
-            pool.apply_async(main, args=(args,))
-            print(pool._processes)
+        if num_process.value < args.num_agent:
+            pool.apply_async(main, args=(args, num_process, lock))
+            with lock:
+                num_process.value += 1

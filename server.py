@@ -3,6 +3,7 @@ import pickle
 import select
 import time
 from client import packing
+from collections import defaultdict
 
 HOST = '0.0.0.0'
 PORT = 8080
@@ -10,12 +11,16 @@ MSG_SIZE = 8192
 TIMEOUT = 100
 SLEEP_TIME = 0.5
 
+def def_value():
+    return 0
+
 client_name_dict = {} # key: name, value: socket
 client_sock_dict = {} # key: socket, value: name
 passive_list = [] # List of clients who are waiting for opponent
 match_list = [] # Use tuple to represent a match
 opponent_dict = {} # key: name, value: opponent name
 match_result = {} # key: (name1, name2), value: result
+match_cnt = defaultdict(def_value)
 
 
 
@@ -113,11 +118,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     name = content[1]
                     opponent = opponent_dict[name]
                     match = (max(name, opponent), min(name, opponent))
+                    match_cnt[match] += 1
                     if name == match[0]:
                         match_result[match] = {
                             name: int(content[2]),
                             opponent: int(content[3])
                         }
+                    if match_cnt[match] == 2:
+                        client_name_dict[name].sendall("END1".encode())
+                        client_name_dict[opponent].sendall("END1".encode())
                 elif content[0] == 'END2':
                     name = content[1]
                     opponent = opponent_dict[name]
