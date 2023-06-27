@@ -55,7 +55,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             else:
                 content = sock.recv(MSG_SIZE).decode('utf-8')
                 content = content.split('#')
-                if content != [""] and content != ["no_event"]: print(content)
+                if content != [""] and content != ["no_event"] and content != ["online_list"]: print(content)
                 if content[0] == 'disconnect':
                     # disconnect while running game
                     if len(content) > 1:

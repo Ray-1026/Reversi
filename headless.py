@@ -44,17 +44,15 @@ def main(args, num_process, lock):
                 num_process.value -= 1
             break
     print(opponent)
-    while True:
-        passive_send_ok(s, user_name, opponent)
-        game_order = get_game_order(s, True, True)
-        if game_order != -1:
-            s.sendall(packing(["OK", user_name]))
-            while True:
-                data = s.recv(1024).decode('utf-8')
-                print("start game 1", data)
-                if data == "OK":
-                    break
-            break
+    passive_send_ok(s, user_name, opponent)
+    game_order = get_game_order(s, True, True)
+    if game_order != -1:
+        s.sendall(packing(["OK", user_name]))
+        while True:
+            data = s.recv(1024).decode('utf-8')
+            print("start game 1", data)
+            if data == "OK":
+                break
         
     print(game_order, "game_order")
     time.sleep(0.5)

@@ -39,7 +39,6 @@ class RemoteAgent:
         """
         data = s.recv(1024).decode()
         data = data.split("#")
-        print(data)
         if 'play' in data[0]:
             move = [int(data[1]), int(data[2])]
             return move
