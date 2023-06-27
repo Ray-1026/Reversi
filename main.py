@@ -381,10 +381,11 @@ def main():
                 waiting_text = large_font.render('Waiting for opponent...', True, white)
                 waiting_rect = waiting_text.get_rect(center=(220, 220))
                 screen.blit(waiting_text, waiting_rect)
+                print("active waiting")
                 fg = active_req_ok(s)
                 if fg == 'agree':
                     sub_status = 'setup pvp game'
-                    stop_sending_trash(s)
+                    stop_sending_trash()
                     screen.fill(black)
                 elif fg == 'opponent_disconnected':
                     screen.fill(black)
@@ -484,7 +485,7 @@ def main():
                     pygame.quit()
                     sys.exit()
             print("start pvp run 1", game_order)
-            s.sendall(packing(["OK", user_name]))
+            # s.sendall(packing(["OK", user_name]))
             agent1 = PVPAgent(game_order)
             agent2 = RemoteAgent("white" if game_order == "black" else "black")
             game = GameLogic(agent1, agent2, screen, s, user_name)
