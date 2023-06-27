@@ -114,9 +114,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     elif content[0] == 'online_list':
                         for name in passive_list:
                             if is_socket_closed(client_name_dict[name]):
-                                del client_sock_dict[client_name_dict[name]]
+                                if name in passive_list:
+                                    passive_list.remove(name)
+
+                                if name in opponent_dict:
+                                    client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
+                                    del opponent_dict[opponent_dict[name]]
+                                    del opponent_dict[name]
+                                
                                 del client_name_dict[name]
-                                passive_list.remove(name)
 
                         sock.sendall(pickle.dumps(passive_list))
                         
