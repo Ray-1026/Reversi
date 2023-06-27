@@ -37,13 +37,12 @@ def main(args, num_process, lock):
     if name_fg == 'Connected':
         start_sending_trash(s)
     
-    while True:
-        opponent = passive_recv_req(s)
-        if opponent != -1:
-            stop_sending_trash()
-            with lock:
-                num_process.value -= 1
-            break
+    opponent = passive_recv_req(s)
+    if opponent != -1:
+        stop_sending_trash()
+        with lock:
+            num_process.value -= 1
+
     print(opponent)
     passive_send_ok(s, user_name, opponent)
     game_order = get_game_order(s, True, True)
