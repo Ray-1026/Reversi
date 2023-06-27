@@ -28,6 +28,7 @@ def main(args, num_process, lock):
         PVPAgent = eval(args.agent)
         user_name = f"{args.agent}_{random_name()}"
         s = connect_server()
+        print(f"{user_name} connected")
         
         name_fg = register_name(user_name, 'passive', s)
         while name_fg == 'Name already exists':
