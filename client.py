@@ -88,7 +88,6 @@ def start_sending_trash(s):
     Thread(target=sending_trash, args=(s, event)).start()
 def stop_sending_trash(s):
     event.set()
-    data = s.recv(1024)
 
 def send_move(s, move: list, user_name):
     content = packing(['play', user_name, str(move[0]), str(move[1])])
