@@ -1,8 +1,7 @@
-import random
 from gamelogic import GameLogic
 
 
-class Agent:
+class MinimaxAgent:
     def __init__(self, first):
         self.game = GameLogic(first)
 

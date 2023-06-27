@@ -1,11 +1,12 @@
 import pygame
 import utils
 import sys
+import time
 import pickle
 from pygame.locals import QUIT, MOUSEBUTTONDOWN
 from board import Board
 
-from client import send_move, runing_disconnect, disconnect
+from client import send_move, running_disconnect, disconnect
 
 class GameLogic:
     def __init__(self, agent1, agent2, screen, sock=None, username=None):
@@ -57,14 +58,15 @@ class GameLogic:
             pos = None  # 下棋的位置
             # print(self.cur_agent.side, self.cur_agent.name)
             # 事件監聽
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    if self.sock is not None:
-                        runing_disconnect(self.sock, self.username)
-                    pygame.quit()
-                    sys.exit()
-                elif self.cur_agent.name == "human" and event.type == MOUSEBUTTONDOWN:  # 如果目前輪到玩家且按下滑鼠左鍵
-                    pos = self.cur_agent.choose(self.board.board, utils.getValidMoves(self.board.board, self.cur_agent.side))
+            if screen is not None:
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        if self.sock is not None:
+                            running_disconnect(self.sock, self.username)
+                        pygame.quit()
+                        sys.exit()
+                    elif self.cur_agent.name == "human" and event.type == MOUSEBUTTONDOWN:  # 如果目前輪到玩家且按下滑鼠左鍵
+                        pos = self.cur_agent.choose(self.board.board, utils.getValidMoves(self.board.board, self.cur_agent.side))
 
             # 如果目前輪到電腦，直接呼叫choose()函式決定下的位置
             if self.cur_agent.name == "agent":
@@ -82,15 +84,18 @@ class GameLogic:
                 # 判斷下回合是否要交換玩家
                 if utils.getValidMoves(self.board.board, self.cur_agent.opponentSide):
                     self.cur_agent = self.agent2 if self.cur_agent == self.agent1 else self.agent1
+                else:
+                    time.sleep(0.5)
             
             elif pos == -1:
                 disconnect(self.sock)
                 return 'running_disconnect'
             
-            self.board.draw(screen, "run", self)
+            if screen is not None:
+                self.board.draw(screen, "run", self)
+                pygame.display.update()
+                main_clock.tick(60)
 
-            pygame.display.update()
-            main_clock.tick(60)
-
-        pygame.time.delay(1000)  # 停留在結果畫面1秒
+        if screen:
+            pygame.time.delay(1000)  # 停留在結果畫面1秒
         return 'end game'

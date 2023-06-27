@@ -4,13 +4,16 @@ import pickle
 import time
 from threading import Event, Thread
 
-SLEEP_TIME = 0.1
+SLEEP_TIME = 0.5
+SLEEP_TIME = 0.5
 event = Event()
+# HOST = 'localhost'
 HOST = 'reversi.jayinnn.dev'    # The remote host
 PORT = 8080             # The same port as used by the server
 
 def packing(things: list):
-    return '#'.join(things).encode()
+    return '#'.join(things).encode('utf-8')
+    
 
 def connect_server():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,40 +30,52 @@ def request_online_list(s):
     content = packing(['online_list'])
     s.sendall(content)
     online_list = s.recv(8192)
-    
-    return pickle.loads(online_list) 
+    try:
+        return pickle.loads(online_list)
+    except:
+        pass
 
-def send_opponent(s, opponent):
-    content = packing(['active_req', opponent])
+def send_opponent(s, user_name, opponent):
+    content = packing(['active_req', user_name, opponent])
     s.sendall(content)
 
 def passive_recv_req(s):
     data = s.recv(8192).decode('utf-8')
+    print("req", data)
     return data[4:] if data.startswith('req') else -1
 
 
 def active_req_ok(s):
     data = s.recv(8192).decode('utf-8')
-    return data == 'OK'
+    return data
 
 def passive_send_ok(s, name, opponent):
     content = packing(['passive_confirm', name, opponent])
     s.sendall(content)
+    data = s.recv(1024).decode('utf-8')
+    print(data)
+    return data
+    
     
 def get_game_order(s, first_game, passive):
+    print("call get_game_order", first_game, passive)
     game_cnt = 'first' if first_game else 'second'
     mode = 'passive' if passive else 'active'
     content = packing(['game_order', game_cnt, mode])
     s.sendall(content)
     data = s.recv(1024).decode('utf-8')
     print(data, "receive")
-    if data == 'white' or data == 'black':
+    if 'white' == data or 'black' == data:
         return data
     else:
         return -1
 
-def disconnect(s):
-    s.sendall('disconnect'.encode())
+def disconnect(s, user_name=None):
+    if user_name:
+        content = packing(['disconnect', user_name])
+    else:
+        content = packing(['disconnect'])
+    s.sendall(content)
     if not event.is_set():
         stop_sending_trash()
     
@@ -82,6 +97,6 @@ def send_move(s, move: list, user_name):
     content = packing(['play', user_name, str(move[0]), str(move[1])])
     s.sendall(content)
     
-def runing_disconnect(s, user_name):
-    content = packing(['disconnect', user_name])
+def running_disconnect(s, user_name):
+    content = packing(['running_disconnect', user_name])
     s.sendall(content)
