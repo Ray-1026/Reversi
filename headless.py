@@ -58,7 +58,6 @@ def main(args, num_process, lock):
     print(game_order, "game_order")
     # time.sleep(0.5)
     # time.sleep(0.5)
-    s.sendall(packing(["OK", user_name]))
     # Start PVP Game 1
     agent1 = PVPAgent(game_order)
     agent2 = RemoteAgent("white" if game_order == "black" else "black")
@@ -85,7 +84,7 @@ def main(args, num_process, lock):
     print(user_name)
     # time.sleep(2)
     # time.sleep(2)
-    s.sendall(packing(["OK", user_name]))
+    s.sendall(packing(["get_order", user_name]))
     while True:
         data = s.recv(1024).decode('utf-8')
         print("start game 2", data)
