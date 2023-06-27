@@ -116,7 +116,6 @@ def main(args, num_process, lock):
 
         return 0
     except:
-        print("exception raised")
         with lock:
             num_process.value -= 1
         return 1
@@ -134,6 +133,7 @@ if __name__ == '__main__':
 
     num_process = manager.Value('i', 0)
     while True:
+        print(f"current process: {num_process.value}")
         if num_process.value < args.num_agent:
             pool.apply_async(main, args=(args, num_process, lock))
             with lock:
