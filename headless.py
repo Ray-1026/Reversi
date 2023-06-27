@@ -26,8 +26,13 @@ def random_name():
 def main(args, num_process, lock):
     PVPAgent = eval(args.agent)
     user_name = f"{args.agent}_{random_name()}"
-    s = connect_server()
-    
+    try:
+        s = connect_server()
+    except:
+        print("Cannot connect to server")
+        with lock:
+            num_process.value -= 1
+        return 1
     
     name_fg = register_name(user_name, 'passive', s)
     while name_fg == 'Name already exists':
