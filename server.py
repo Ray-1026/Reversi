@@ -155,6 +155,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         sock.sendall(pickle.dumps(match_result[match]))
                         client_name_dict[opponent].sendall(pickle.dumps(match_result[match]))
                         match_order_recv_cnt[match] = 0
+                        match_cnt[match] = 0
                 elif content[0] == 'get_order':
                     name = content[1]
                     opponent = opponent_dict[name]
