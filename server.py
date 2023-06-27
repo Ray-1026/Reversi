@@ -103,7 +103,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     
                 elif content[0] == 'game_order':
                     first_game = True if content[1] == 'first' else False
-                    passive = True if content[2] == 'passive' else False
+                    passive = True if 'passive' in content[2]  else False
                     game_order = 'black' if (first_game and not passive) or (not first_game and passive) else 'white'
                     sock.sendall(game_order.encode())
                 
