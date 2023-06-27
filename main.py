@@ -383,11 +383,11 @@ def main():
                 screen.blit(waiting_text, waiting_rect)
                 print("active waiting")
                 fg = active_req_ok(s)
-                if fg == 'agree':
+                if "agree" in fg:
                     sub_status = 'setup pvp game'
                     stop_sending_trash()
                     screen.fill(black)
-                elif fg == 'opponent_disconnected':
+                elif 'opponent_disconnected' in fg:
                     screen.fill(black)
                     while True:
                         restart_game_text = large_font.render('Opponent disconnected', True, white)
@@ -505,11 +505,11 @@ def main():
                 s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
                 data = s.recv(1024).decode('utf-8')
                 if data != "END1":
+                    print(data)
                     print("end1 error")
             game_order = get_game_order(s, False, passive)
             if game_order != -1:
                 print(game_order, "game_order")
-                time.sleep(0.5)
                 s.sendall(packing(["OK", user_name]))
                 data = s.recv(1024).decode('utf-8')
                 print("start game 2", data)

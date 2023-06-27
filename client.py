@@ -55,6 +55,7 @@ def passive_send_ok(s, name, opponent):
     
     
 def get_game_order(s, first_game, passive):
+    print("call get_game_order", first_game, passive)
     game_cnt = 'first' if first_game else 'second'
     mode = 'passive' if passive else 'active'
     content = packing(['game_order', game_cnt, mode])

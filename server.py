@@ -20,6 +20,7 @@ passive_list = [] # List of clients who are waiting for opponent
 opponent_dict = {} # key: name, value: opponent name
 match_result = {} # key: (name1, name2), value: result
 match_cnt = defaultdict(def_value)
+match_order_recv_cnt = defaultdict(def_value)
 
 
 # def sending_trash(conn):
@@ -142,6 +143,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     if match_cnt[match] == 2:
                         client_name_dict[name].sendall("END1".encode())
                         client_name_dict[opponent].sendall("END1".encode())
+                        match_order_recv_cnt[match] = 0
                 elif content[0] == 'END2':
                     name = content[1]
                     opponent = opponent_dict[name]
@@ -151,10 +153,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         match_result[match][opponent] += int(content[3])
                         sock.sendall(pickle.dumps(match_result[match]))
                         client_name_dict[opponent].sendall(pickle.dumps(match_result[match]))
-                elif content[0] == 'OK':
+                elif content[0] == 'get_order':
                     name = content[1]
-                    print(name, opponent_dict[name])
-                    client_name_dict[opponent_dict[name]].sendall('OK'.encode())
+                    opponent = opponent_dict[name]
+                    match = (max(name, opponent), min(name, opponent))
+                    match_order_recv_cnt[match] += 1
+                    if match_order_recv_cnt[match] == 2:
+                        client_name_dict[opponent].sendall('OK'.encode())
+                        client_name_dict[name].sendall('OK'.encode())
                     
                     
     

@@ -48,7 +48,7 @@ def main(args, num_process, lock):
     passive_send_ok(s, user_name, opponent)
     game_order = get_game_order(s, True, True)
     if game_order != -1:
-        s.sendall(packing(["OK", user_name]))
+        s.sendall(packing(["get_order", user_name]))
         while True:
             data = s.recv(1024).decode('utf-8')
             print("start game 1", data)
@@ -75,6 +75,7 @@ def main(args, num_process, lock):
     s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
     data = s.recv(1024).decode('utf-8')
     if data != "END1":
+        print(data)
         print("end1 error")
     while True:
         game_order = get_game_order(s, False, True)
