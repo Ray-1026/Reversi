@@ -463,13 +463,14 @@ def main():
                         sys.exit()
                     
                     game_order = get_game_order(s, True, passive)
+                    print("game order", game_order)
                     setup_text = large_font.render('Loading...', True, white)
                     setup_rect = setup_text.get_rect(center=(220, 220))
                     
                     screen.blit(setup_text, setup_rect)
                     if game_order != -1:
                         while True:
-                            s.sendall(packing(["OK", user_name]))
+                            s.sendall(packing(["get_order", user_name]))
                             data = s.recv(1024).decode('utf-8')
                             print("start game 1", data)
                             if data == "OK":
@@ -510,7 +511,7 @@ def main():
             game_order = get_game_order(s, False, passive)
             if game_order != -1:
                 print(game_order, "game_order")
-                s.sendall(packing(["OK", user_name]))
+                s.sendall(packing(["get_order", user_name]))
                 data = s.recv(1024).decode('utf-8')
                 print("start game 2", data)
                 if "OK" in data:
