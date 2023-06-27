@@ -73,6 +73,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     name = client_sock_dict[sock]
                     if name in passive_list:
                         passive_list.remove(name)
+
                     if name in opponent_dict:
                         client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
                         del opponent_dict[opponent_dict[name]]
@@ -80,7 +81,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     
                     del client_name_dict[name]
                     del client_sock_dict[sock]
-            
+                                
                 elif content[0] == 'register':
                     client_name = content[1]
                     client_mode = content[2]
@@ -153,6 +154,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         match_result[match][opponent] += int(content[3])
                         sock.sendall(pickle.dumps(match_result[match]))
                         client_name_dict[opponent].sendall(pickle.dumps(match_result[match]))
+                        match_order_recv_cnt[match] = 0
                 elif content[0] == 'get_order':
                     name = content[1]
                     opponent = opponent_dict[name]
