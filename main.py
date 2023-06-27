@@ -32,8 +32,8 @@ def main():
     # 玩家設定
 
     PVCAgent = MinimaxAgent
-    CVCAgent1 = MinimaxAgent
-    CVCAgent2 = Agent
+    CVCAgent1 = MinimaxAgent # black
+    CVCAgent2 = Agent        # white
     PVPAgent = Agent
 
     
@@ -117,8 +117,8 @@ def main():
                             agent1 = PlayerAgent(chooseSide)  # 玩家
                             agent2 = PVCAgent("white" if chooseSide == "black" else "black")  # 電腦
                         else:  # 選擇CVC模式
-                            agent1 = CVCAgent1("white")  # 1號電腦
-                            agent2 = CVCAgent2("black")  # 2號電腦
+                            agent1 = CVCAgent1("black")  # 1號電腦
+                            agent2 = CVCAgent2("white")  # 2號電腦
                         game = GameLogic(agent1, agent2, screen)
                         pygame.time.delay(750)
                     elif 240 <= x and x <= 320 and 40 <= y and y <= 80:  # 按下PVC模式

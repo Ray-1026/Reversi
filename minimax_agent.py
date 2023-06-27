@@ -1,29 +1,11 @@
-from gamelogic import GameLogic
-
+import utils
 
 class MinimaxAgent:
-    def __init__(self, first):
-        self.game = GameLogic(first)
+    def __init__(self, side):
+        self.side = side
+        self.name = "agent"
+        self.opponentSide = "black" if self.side == "white" else "white"
 
-    def getBoardCopy(self, board):
-        """
-        複製棋盤
-        """
-        copied = []
-        for i in range(8):
-            copied.append(["none"] * 8)
-        for x in range(8):
-            for y in range(8):
-                copied[x][y] = board[x][y]
-        return copied
-
-    def isOnCorner(self, x, y):
-        """
-        判斷x, y是否在角落
-        """
-        return (
-            (x == 0 and y == 0) or (x == 0 and y == 7) or (x == 7 and y == 0) or (x == 7 and y == 7)
-        )
     def evaluate(self, board):
         """
         評估函數
@@ -31,46 +13,47 @@ class MinimaxAgent:
         score = 0
         for x in range(8):
             for y in range(8):
-                if board[x][y] == self.game.computerTile:
+                if board[x][y] == self.side:
                     score += 1
-                elif board[x][y] == self.game.playerTile:
+                elif board[x][y] == self.opponentSide:
                     score -= 1
         return score
     
     def minimax(self, board, depth, maximized):
-        if depth == 0 or self.game.getValidMoves(board, self.game.computerTile) == 0:
+        if depth == 0 or len(utils.getValidMoves(board, self.side if maximized else self.opponentSide)) == 0:
             return self.evaluate(board), None
+       
         if maximized:
-            val = -100000
+            val = float("-inf")
             move = None
-            for x, y in self.game.getValidMoves(board, self.game.computerTile):
-                copyBoard = self.getBoardCopy(board)
-                self.game.makeMove(copyBoard, self.game.computerTile, x, y)
+            for x, y in utils.getValidMoves(board, self.side):
+                copyBoard = utils.getBoardCopy(board)
+                utils.flip(copyBoard, self.side, x, y)
+                child_score, _ = self.minimax(copyBoard, depth-1, False)
+                # 接下來要判斷 child_score 是否比 val 大，如果是的話，就更新 val 和 move，move 是一個 list 或是 tuple
                 # START YOUR CODE #
-                # val = max(val, self.minimax(copyBoard, depth-1, False))
-                tmp, m = self.minimax(copyBoard, depth-1, False)
-                if tmp > val:
-                    val = tmp
-                    move = (x, y)
+
                 # END YOUR CODE #
+
             return val, move
         else:
-            val = 100000
+            val = float("inf")
             move = None
-            for x, y in self.game.getValidMoves(board, self.game.playerTile):
-                copyBoard = self.getBoardCopy(board)
-                self.game.makeMove(copyBoard, self.game.playerTile, x, y)
+            for x, y in utils.getValidMoves(board, self.opponentSide):
+                copyBoard = utils.getBoardCopy(board)
+                utils.flip(copyBoard, self.opponentSide, x, y)
+                child_score, _ = self.minimax(copyBoard, depth-1, True)           
+                # 接下來要判斷 child_score 是否比 val 小，如果是的話，就更新 val 和 move，move 是一個 list 或是 tuple
                 # START YOUR CODE #
-                tmp, m = self.minimax(copyBoard, depth-1, False)
-                if tmp < val:
-                    val = tmp
-                    move = (x, y)
+
                 # END YOUR CODE #
+                
             return val, move
 
-    def choose(self, board):
+    def choose(self, board, valid_moves):
         """
         用最白癡的greedy選擇最佳的走法
         """
         _, bestMove = self.minimax(board, 3, True)
+
         return bestMove
