@@ -5,7 +5,7 @@ import time
 from client import packing
 from collections import defaultdict
 
-HOST = '0.0.0.0'
+HOST = '127.0.0.1'
 PORT = 8080
 MSG_SIZE = 8192
 TIMEOUT = 100
@@ -17,26 +17,24 @@ def def_value():
 client_name_dict = {} # key: name, value: socket
 client_sock_dict = {} # key: socket, value: name
 passive_list = [] # List of clients who are waiting for opponent
-match_list = [] # Use tuple to represent a match
 opponent_dict = {} # key: name, value: opponent name
 match_result = {} # key: (name1, name2), value: result
 match_cnt = defaultdict(def_value)
 
 
+# def sending_trash(conn):
+#     while True:
+#         conn.send(' '.encode())
+#         time.sleep(1)
 
-def sending_trash(conn):
-    while True:
-        conn.send(' '.encode())
-        time.sleep(1)
-
-def handle_disconnect(conn, addr):
-    while True:
-        try:
-            data = conn.recv(8192).decode('utf-8')
-        except:
-            continue
-        if 'disconnect' in data:
-            print(f'{addr} disconnected')
+# def handle_disconnect(conn, addr):
+#     while True:
+#         try:
+#             data = conn.recv(8192).decode('utf-8')
+#         except:
+#             continue
+#         if 'disconnect' in data:
+#             print(f'{addr} disconnected')
             
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -55,17 +53,30 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             else:
                 content = sock.recv(MSG_SIZE).decode('utf-8')
                 content = content.split('#')
-                if content != [""] and content != ["no_event"] and content != ["online_list"]: print(content)
+                if content != [""] and content != ['no_event'] and content != ['online_list']: print(content)
+                if content[0] == 'running_disconnect':
+                    name = content[1]
+                    client_name_dict[opponent_dict[name]].sendall(packing(["opponent_disconnect"]))
+                    for match in match_result: 
+                        if match[0] == name or match[1] == name:
+                            print(f'remove match {match}')
+                            del match_result[match]
+                            break
+                    del opponent_dict[opponent_dict[name]]
+                    del opponent_dict[name]
+                    
                 if content[0] == 'disconnect':
                     # disconnect while running game
-                    if len(content) > 1:
-                        name = content[1]
-                        client_name_dict[opponent_dict[name]].sendall(packing(["opponent_disconnect"]))
-                        del opponent_dict[name]
-                        
                     sock.close()
                     socket_list.remove(sock)
                     name = client_sock_dict[sock]
+                    if name in passive_list:
+                        passive_list.remove(name)
+                    if name in opponent_dict:
+                        client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
+                        del opponent_dict[opponent_dict[name]]
+                        del opponent_dict[name]
+                    
                     del client_name_dict[name]
                     del client_sock_dict[sock]
             
@@ -87,20 +98,23 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 elif content[0] == 'online_list':
                     sock.sendall(pickle.dumps(passive_list))
                     
-                
                 elif content[0] == 'active_req':
-                    opponent = content[1]
+                    active_player = content[1]
+                    opponent = content[2]
                     passive_list.remove(opponent)
+                    opponent_dict[opponent] = active_player
+                    opponent_dict[active_player] = opponent
                     client_name_dict[opponent].sendall(f'req {client_sock_dict[sock]}'.encode())
-                    
                 
                 elif content[0] == 'passive_confirm':
                     passive_player = content[1]
                     opponent = content[2]
-                    opponent_dict[opponent] = passive_player
-                    opponent_dict[passive_player] = opponent
-                    client_name_dict[opponent].sendall('agree'.encode())
-                    
+                    if opponent in client_name_dict:
+                        client_name_dict[opponent].sendall('agree'.encode())
+                        sock.sendall('success_send_agree'.encode())
+                    else:
+                        sock.sendall('opponent_disconnected'.encode())
+                        
                 elif content[0] == 'game_order':
                     first_game = True if content[1] == 'first' else False
                     passive = True if 'passive' in content[2]  else False
@@ -140,5 +154,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     name = content[1]
                     print(name, opponent_dict[name])
                     client_name_dict[opponent_dict[name]].sendall('OK'.encode())
+                    
+                    
+    
 
                 

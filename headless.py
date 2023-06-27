@@ -27,7 +27,8 @@ def main(args, num_process, lock):
     PVPAgent = eval(args.agent)
     user_name = f"{args.agent}_{random_name()}"
     s = connect_server()
-
+    
+    
     name_fg = register_name(user_name, 'passive', s)
     while name_fg == 'Name already exists':
         user_name = f"{args.agent}_{random_name()}"
@@ -55,13 +56,15 @@ def main(args, num_process, lock):
                 break
         
     print(game_order, "game_order")
-    time.sleep(0.5)
+    # time.sleep(0.5)
+    # time.sleep(0.5)
     s.sendall(packing(["OK", user_name]))
     # Start PVP Game 1
     agent1 = PVPAgent(game_order)
     agent2 = RemoteAgent("white" if game_order == "black" else "black")
     game = GameLogic(agent1, agent2, None, s, user_name)
-    time.sleep(0.25)
+    # time.sleep(0.25)
+    # time.sleep(0.25)
     disconnect_fg = game.run(None, None)
     if disconnect_fg == 'running_disconnect':
         print("running_disconnect")
@@ -79,7 +82,8 @@ def main(args, num_process, lock):
             break
     print(game_order, "game_order")
     print(user_name)
-    time.sleep(2)
+    # time.sleep(2)
+    # time.sleep(2)
     s.sendall(packing(["OK", user_name]))
     while True:
         data = s.recv(1024).decode('utf-8')
@@ -90,7 +94,8 @@ def main(args, num_process, lock):
             return 1
         else:
             break
-    time.sleep(1)
+    # time.sleep(1)
+    # time.sleep(1)
     agent1 = PVPAgent(game_order)
     agent2 = RemoteAgent("white" if game_order == "black" else "black")
     game = GameLogic(agent1, agent2, None, s, user_name)
@@ -118,6 +123,8 @@ if __name__ == '__main__':
     parser.add_argument('--agent', type=str, default='Agent')
     parser.add_argument('--num_agent', type=int, default=1)
     args = parser.parse_args()
+    print(args)
+    print(args)
     pool = multiprocessing.Pool(4)
     manager = Manager()
     lock = manager.Lock()

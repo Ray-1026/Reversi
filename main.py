@@ -27,6 +27,8 @@ def main():
     user_name = ''
     at_input = True
     name_exist = False
+    move_window = 0
+    move_window = 0
 
     # 玩家設定
 
@@ -237,6 +239,7 @@ def main():
                     screen.blit(text_active, button_active)
                     
                     if event.type == QUIT:
+                        disconnect(s)
                         pygame.quit()
                         sys.exit()
                     elif event.type == MOUSEBUTTONDOWN:
@@ -254,6 +257,7 @@ def main():
                 for event in pygame.event.get():
                     x, y = pygame.mouse.get_pos()
                     if event.type == QUIT:
+                        disconnect(s)
                         pygame.quit()
                         sys.exit()
                         
@@ -303,77 +307,103 @@ def main():
                     screen.blit(name, (name_input_box.x+5, name_input_box.y+5))
                     
             elif sub_status == 'online list':
-                
-                    if passive:
-                        # render waiting
-                        waiting_text = large_font.render('Waiting for opponent...', True, white)
-                        waiting_rect = waiting_text.get_rect(center=(220, 220))
-                        screen.blit(waiting_text, waiting_rect)
-                        opponent = passive_recv_req(s)
-                        
-                        # receive match request
-                        if opponent != -1:
-                            stop_sending_trash()
-                            req_text = small_font.render(f'{opponent} want to play with you!', True, white)
-                            req_rect = req_text.get_rect(center=(220, 50))
-                            screen.blit(req_text, req_rect)
-                            sub_status = 'passive confirm'
-                        
-                        # 讓pygame不要死機  
-                        for event in pygame.event.get():                    
-                            if event.type == QUIT:
-                                disconnect(s)
-                                pygame.quit()
-                                sys.exit()
-                    else: 
-                        # render online list
-                        for event in pygame.event.get():
-                            x, y = pygame.mouse.get_pos()
-                            screen.fill(black)
-                            if event.type == QUIT:
-                                disconnect(s)
-                                pygame.quit()
-                                sys.exit()
-                                
-                            # get online list
-                            online_list = request_online_list(s)
-                            if online_list != -1:
-                                for idx, name in enumerate(online_list):
-                                    user_text = small_font.render(name, True, white)
-                                    user_rect = user_text.get_rect(center=(220, 50*(idx+1)))
-                                    
-                                    if user_rect.collidepoint((x, y)):
-                                        pygame.draw.rect(screen, green, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 2)
-                                    else:
-                                        pygame.draw.rect(screen, black, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 0)
-                                        
-                                    # send match request to choosen opponent
-                                    if event.type == pygame.MOUSEBUTTONDOWN:
-                                        if user_rect.collidepoint((x, y)) :
-                                            sub_status = 'active waiting'
-                                            send_opponent(s, name)
-                                            start_sending_trash(s)
-                                            screen.fill(black)
-                                            break
-                                        
-                                    screen.blit(user_text, user_rect)
-                            else:
-                                print('Internal server error')
-                                disconnect(s)
-                                pygame.quit()
-                                sys.exit()
+                online_list_height = 420 
+                online_list_top = (440 - online_list_height) // 2 
+                row_distance = 10
+                ol_block_size = 20+row_distance
+                if passive:
+                    # render waiting
+                    waiting_text = large_font.render('Waiting for opponent...', True, white)
+                    waiting_rect = waiting_text.get_rect(center=(220, 220))
+                    screen.blit(waiting_text, waiting_rect)
+                    opponent = passive_recv_req(s)
+                    
+                    # receive match request
+                    if opponent != -1:
+                        stop_sending_trash(s)
+                        req_text = small_font.render(f'{opponent} want to play with you!', True, white)
+                        req_rect = req_text.get_rect(center=(220, 50))
+                        screen.blit(req_text, req_rect)
+                        sub_status = 'passive confirm'
+                    
+                    # 讓pygame不要死機  
+                    for event in pygame.event.get():                    
+                        if event.type == QUIT:
+                            disconnect(s, user_name)
+                            pygame.quit()
+                            sys.exit()
+                else: 
+                    # render online list
+                    for event in pygame.event.get():
+                        x, y = pygame.mouse.get_pos()
+                        screen.fill(black)
+                        if event.type == QUIT:
+                            disconnect(s)
+                            pygame.quit()
+                            sys.exit()
                             
+                        # get online list
+                        online_list = request_online_list(s)
+                        if online_list != -1:
+                            for idx, name in enumerate(online_list):
+                                user_text = small_font.render(name, True, white)
+                                user_rect = user_text.get_rect(center=(
+                                    220, ol_block_size*(idx+1) + online_list_top + move_window))
+                        
+                                if user_rect.collidepoint((x, y)):
+                                    pygame.draw.rect(screen, green, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 2)
+                                else:
+                                    pygame.draw.rect(screen, black, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 0)
+                                    
+                                # send match request to choosen opponent
+                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                    if event.button == 4:
+                                        move_window -= 10 
+                                    elif event.button == 5:
+                                        move_window += 10
+                                        
+                                    if event.button == 1 and user_rect.collidepoint((x, y)) :
+                                        sub_status = 'active waiting'
+                                        send_opponent(s, user_name, name)
+                                        start_sending_trash(s)
+                                        screen.fill(black)
+                                        break
+                                    
+                                screen.blit(user_text, user_rect)
+                        else:
+                            print('Internal server error')
+                            disconnect(s)
+                            pygame.quit()
+                            sys.exit()
+                        
             elif sub_status == 'active waiting':
                 
                 waiting_text = large_font.render('Waiting for opponent...', True, white)
                 waiting_rect = waiting_text.get_rect(center=(220, 220))
                 screen.blit(waiting_text, waiting_rect)
-                    
-                if active_req_ok(s):
+                fg = active_req_ok(s)
+                if fg == 'agree':
                     sub_status = 'setup pvp game'
-                    stop_sending_trash()
+                    stop_sending_trash(s)
                     screen.fill(black)
-                    
+                elif fg == 'opponent_disconnected':
+                    screen.fill(black)
+                    while True:
+                        restart_game_text = large_font.render('Opponent disconnected', True, white)
+                        next_line_text = large_font.render('Please restart game!!!', True, white)
+                        
+                        next_line_rect = restart_game_text.get_rect(center=(220, 262))
+                        restart_game_rect = restart_game_text.get_rect(center=(220, 220))
+                        screen.blit(next_line_text, next_line_rect)
+                        screen.blit(restart_game_text, restart_game_rect)
+                        for event in pygame.event.get():
+                            if event.type == QUIT:
+                                disconnect(s)
+                                pygame.quit()
+                                sys.exit()
+                        pygame.display.update()
+                        main_clock.tick(60)
+                        
                 for event in pygame.event.get():
                     if event.type == QUIT:
                         disconnect(s)
@@ -400,15 +430,34 @@ def main():
                     # send ok request
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if ok_rect.collidepoint((x, y)):
-                            passive_send_ok(s, user_name, opponent)
-                            screen.fill(black)
-                            sub_status = 'setup pvp game'
-                            break
+                            fg = passive_send_ok(s, user_name, opponent)
+                            if fg == 'opponent_disconnected':
+                                screen.fill(black)
+                                while True:
+                                    restart_game_text = large_font.render('Opponent disconnected', True, white)
+                                    next_line_text = large_font.render('Please restart game!!!', True, white)
+                                    
+                                    next_line_rect = restart_game_text.get_rect(center=(220, 262))
+                                    restart_game_rect = restart_game_text.get_rect(center=(220, 220))
+                                    screen.blit(next_line_text, next_line_rect)
+                                    screen.blit(restart_game_text, restart_game_rect)
+                                    for event in pygame.event.get():
+                                        if event.type == QUIT:
+                                            disconnect(s)
+                                            pygame.quit()
+                                            sys.exit()
+                                    pygame.display.update()
+                                    main_clock.tick(60)
+                            else:
+                                screen.fill(black)
+                                sub_status = 'setup pvp game'
+                                break
                     screen.blit(ok_text, ok_rect)
                     
             elif sub_status =='setup pvp game':
                 for event in pygame.event.get():
                     if event.type == QUIT:
+                        disconnect(s)
                         pygame.quit()
                         sys.exit()
                     
@@ -481,6 +530,7 @@ def main():
                 status = "PVP end run 2"
                 score = utils.getScore(game.board.board)
                 s.sendall(packing(["END2", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
+                time.sleep(1)
                 data = s.recv(2048)
                 results = pickle.loads(data)
                 disconnect(s)
