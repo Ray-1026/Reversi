@@ -35,12 +35,10 @@ def main(args, num_process, lock):
             user_name = f"{args.agent}_{random_name()}"
             name_fg = register_name(user_name, 'passive', s)
         
-        if name_fg == 'Connected':
-            start_sending_trash(s)
         
         opponent = passive_recv_req(s)
         if opponent != -1:
-            stop_sending_trash()
+            # stop_sending_trash()
             with lock:
                 num_process.value -= 1
 

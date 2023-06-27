@@ -271,8 +271,8 @@ def main():
                             
                             if name_fg == 'Connected':
                                 sub_status = 'online list'
-                                if mode == 'passive':
-                                    start_sending_trash(s)
+                                # if mode == 'passive':
+                                #     start_sending_trash(s)
                                 screen.fill(black)
                                 name_exist = False
                                 break
@@ -320,7 +320,7 @@ def main():
                     
                     # receive match request
                     if opponent != -1:
-                        stop_sending_trash()
+                        # stop_sending_trash()
                         req_text = small_font.render(f'{opponent} want to play with you!', True, white)
                         req_rect = req_text.get_rect(center=(220, 50))
                         screen.blit(req_text, req_rect)
@@ -365,7 +365,7 @@ def main():
                                     if event.button == 1 and user_rect.collidepoint((x, y)) :
                                         sub_status = 'active waiting'
                                         send_opponent(s, user_name, name)
-                                        start_sending_trash(s)
+                                        # start_sending_trash(s)
                                         screen.fill(black)
                                         break
                                     
@@ -385,7 +385,7 @@ def main():
                 fg = active_req_ok(s)
                 if "agree" in fg:
                     sub_status = 'setup pvp game'
-                    stop_sending_trash()
+                    # stop_sending_trash()
                     screen.fill(black)
                 elif 'opponent_disconnected' in fg:
                     screen.fill(black)

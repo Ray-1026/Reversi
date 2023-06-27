@@ -30,8 +30,10 @@ def request_online_list(s):
     content = packing(['online_list'])
     s.sendall(content)
     online_list = s.recv(8192)
-    
-    return pickle.loads(online_list) 
+    try:
+        return pickle.loads(online_list)
+    except:
+        pass
 
 def send_opponent(s, user_name, opponent):
     content = packing(['active_req', user_name, opponent])
