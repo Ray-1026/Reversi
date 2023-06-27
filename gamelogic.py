@@ -85,7 +85,7 @@ class GameLogic:
                 if utils.getValidMoves(self.board.board, self.cur_agent.opponentSide):
                     self.cur_agent = self.agent2 if self.cur_agent == self.agent1 else self.agent1
                 else:
-                    time.sleep(0.25)
+                    time.sleep(0.5)
             
             elif pos == -1:
                 disconnect(self.sock)
