@@ -125,7 +125,7 @@ if __name__ == '__main__':
     parser.add_argument('--agent', type=str, default='Agent')
     parser.add_argument('--num_agent', type=int, default=1)
     args = parser.parse_args()
-    pool = multiprocessing.Pool(4)
+    pool = multiprocessing.Pool(8)
     manager = Manager()
     lock = manager.Lock()
 

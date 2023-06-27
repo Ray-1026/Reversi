@@ -38,10 +38,24 @@ match_order_recv_cnt = defaultdict(def_value)
 #             print(f'{addr} disconnected')
             
 
+def is_socket_closed(sock: socket.socket) -> bool:
+    try:
+        # this will try to read bytes without blocking and also without removing them from buffer (peek only)
+        data = sock.recv(16, socket.MSG_DONTWAIT | socket.MSG_PEEK)
+        if len(data) == 0:
+            return True
+    except BlockingIOError:
+        return False  # socket is open and reading from it would block
+    except ConnectionResetError:
+        return True  # socket was closed for some other reason
+    except Exception as e:
+        return False
+    return False
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
-    s.listen(40) # Up to 40 clients
+    s.listen(200) # Up to 200 clients
     print("Reversi server is running...")
     socket_list = [s]
     try:
@@ -98,6 +112,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                             passive_list.append(client_name)
                             
                     elif content[0] == 'online_list':
+                        for name in passive_list:
+                            if is_socket_closed(client_name_dict[name]):
+                                del client_sock_dict[client_name_dict[name]]
+                                del client_name_dict[name]
+                                passive_list.remove(name)
+
                         sock.sendall(pickle.dumps(passive_list))
                         
                     elif content[0] == 'active_req':
@@ -166,4 +186,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                             client_name_dict[name].sendall('OK'.encode())
     except:
         pass
-    
