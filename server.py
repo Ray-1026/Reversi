@@ -5,7 +5,7 @@ import time
 from client import packing
 from collections import defaultdict
 
-HOST = '127.0.0.1'
+HOST = '0.0.0.0'
 PORT = 8080
 MSG_SIZE = 8192
 TIMEOUT = 100
