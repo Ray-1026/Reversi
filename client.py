@@ -74,7 +74,7 @@ def disconnect(s, user_name=None):
         content = packing(['disconnect'])
     s.sendall(content)
     if not event.is_set():
-        stop_sending_trash(s)
+        stop_sending_trash()
     
 def sending_trash(s, event):
     while True:
