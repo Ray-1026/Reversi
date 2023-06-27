@@ -113,11 +113,12 @@ def main(args, num_process, lock):
         print(results)
 
         return 0
-    except:
-        with lock:
-            num_process.value -= 1
+    # except all exceptions exclude KeyboardInterrupt
+    except Exception as e:
+        print(e)
+        print("error")
         return 1
-
+    
 
 
 if __name__ == '__main__':
