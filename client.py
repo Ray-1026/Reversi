@@ -86,7 +86,7 @@ def sending_trash(s, event):
 def start_sending_trash(s):
     event.clear()
     Thread(target=sending_trash, args=(s, event)).start()
-def stop_sending_trash(s):
+def stop_sending_trash():
     event.set()
 
 def send_move(s, move: list, user_name):
