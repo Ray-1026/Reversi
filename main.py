@@ -34,7 +34,7 @@ def main():
     PVCAgent = MinimaxAgent
     CVCAgent1 = MinimaxAgent # black
     CVCAgent2 = Agent        # white
-    PVPAgent = Agent
+    PVPAgent = PlayerAgent
 
     
     color = (255, 255, 255)
