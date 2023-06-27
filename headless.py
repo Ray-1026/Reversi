@@ -24,101 +24,101 @@ def random_name():
     return ''.join(random.choice(string.ascii_letters) for _ in range(3))
 
 def main(args, num_process, lock):
-    PVPAgent = eval(args.agent)
-    user_name = f"{args.agent}_{random_name()}"
     try:
-        s = connect_server()
-    except:
-        print("Cannot connect to server")
-        with lock:
-            num_process.value -= 1
-        return 1
-    
-    name_fg = register_name(user_name, 'passive', s)
-    while name_fg == 'Name already exists':
+        PVPAgent = eval(args.agent)
         user_name = f"{args.agent}_{random_name()}"
+        s = connect_server()
+        
         name_fg = register_name(user_name, 'passive', s)
-    
-    if name_fg == 'Connected':
-        start_sending_trash(s)
-    
-    opponent = passive_recv_req(s)
-    if opponent != -1:
-        stop_sending_trash()
-        with lock:
-            num_process.value -= 1
+        while name_fg == 'Name already exists':
+            user_name = f"{args.agent}_{random_name()}"
+            name_fg = register_name(user_name, 'passive', s)
+        
+        if name_fg == 'Connected':
+            start_sending_trash(s)
+        
+        opponent = passive_recv_req(s)
+        if opponent != -1:
+            stop_sending_trash()
+            with lock:
+                num_process.value -= 1
 
-    print(opponent)
-    passive_send_ok(s, user_name, opponent)
-    game_order = get_game_order(s, True, True)
-    if game_order != -1:
+        print(opponent)
+        passive_send_ok(s, user_name, opponent)
+        game_order = get_game_order(s, True, True)
+        if game_order != -1:
+            s.sendall(packing(["get_order", user_name]))
+            while True:
+                data = s.recv(1024).decode('utf-8')
+                print("start game 1", data)
+                if data == "OK":
+                    break
+            
+        print(game_order, "game_order")
+        # time.sleep(0.5)
+        # time.sleep(0.5)
+        # Start PVP Game 1
+        agent1 = PVPAgent(game_order)
+        agent2 = RemoteAgent("white" if game_order == "black" else "black")
+        game = GameLogic(agent1, agent2, None, s, user_name)
+        # time.sleep(0.25)
+        # time.sleep(0.25)
+        disconnect_fg = game.run(None, None)
+        if disconnect_fg == 'running_disconnect':
+            print("running_disconnect")
+            running_disconnect(s, user_name)
+            return 1
+        
+        score = utils.getScore(game.board.board)
+        s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
+        data = s.recv(1024).decode('utf-8')
+        if data != "END1":
+            print(data)
+            print("end1 error")
+        while True:
+            game_order = get_game_order(s, False, True)
+            if game_order != -1:
+                break
+        print(game_order, "game_order")
+        print(user_name)
+        # time.sleep(2)
+        # time.sleep(2)
         s.sendall(packing(["get_order", user_name]))
         while True:
             data = s.recv(1024).decode('utf-8')
-            print("start game 1", data)
-            if data == "OK":
+            print("start game 2", data)
+            if data != "OK":
+                print("error")
+                running_disconnect(s, user_name)
+                return 1
+            else:
                 break
-        
-    print(game_order, "game_order")
-    # time.sleep(0.5)
-    # time.sleep(0.5)
-    # Start PVP Game 1
-    agent1 = PVPAgent(game_order)
-    agent2 = RemoteAgent("white" if game_order == "black" else "black")
-    game = GameLogic(agent1, agent2, None, s, user_name)
-    # time.sleep(0.25)
-    # time.sleep(0.25)
-    disconnect_fg = game.run(None, None)
-    if disconnect_fg == 'running_disconnect':
-        print("running_disconnect")
-        running_disconnect(s, user_name)
-        return 1
-    
-    score = utils.getScore(game.board.board)
-    s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
-    data = s.recv(1024).decode('utf-8')
-    if data != "END1":
-        print(data)
-        print("end1 error")
-    while True:
-        game_order = get_game_order(s, False, True)
-        if game_order != -1:
-            break
-    print(game_order, "game_order")
-    print(user_name)
-    # time.sleep(2)
-    # time.sleep(2)
-    s.sendall(packing(["get_order", user_name]))
-    while True:
-        data = s.recv(1024).decode('utf-8')
-        print("start game 2", data)
-        if data != "OK":
-            print("error")
+        # time.sleep(1)
+        # time.sleep(1)
+        agent1 = PVPAgent(game_order)
+        agent2 = RemoteAgent("white" if game_order == "black" else "black")
+        game = GameLogic(agent1, agent2, None, s, user_name)
+        disconnect_fg = game.run(None, None)
+        if disconnect_fg == 'running_disconnect':
+            print("running_disconnect")
             running_disconnect(s, user_name)
             return 1
-        else:
-            break
-    # time.sleep(1)
-    # time.sleep(1)
-    agent1 = PVPAgent(game_order)
-    agent2 = RemoteAgent("white" if game_order == "black" else "black")
-    game = GameLogic(agent1, agent2, None, s, user_name)
-    disconnect_fg = game.run(None, None)
-    if disconnect_fg == 'running_disconnect':
-        print("running_disconnect")
-        running_disconnect(s, user_name)
+        elif disconnect_fg == 'end game':
+            score = utils.getScore(game.board.board)
+            s.sendall(packing(["END2", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
+            data = s.recv(2048)
+            results = pickle.loads(data)
+            disconnect(s)
+
+        print("end game")
+        print(results)
+
+        return 0
+    except:
+        print("exception raised")
+        with lock:
+            num_process.value -= 1
         return 1
-    elif disconnect_fg == 'end game':
-        score = utils.getScore(game.board.board)
-        s.sendall(packing(["END2", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
-        data = s.recv(2048)
-        results = pickle.loads(data)
-        disconnect(s)
-
-    print("end game")
-    print(results)
-
-    return 0
 
 
 
@@ -134,10 +134,6 @@ if __name__ == '__main__':
     num_process = manager.Value('i', 0)
     while True:
         if num_process.value < args.num_agent:
-            try:
-                pool.apply_async(main, args=(args, num_process, lock))
-                with lock:
-                    num_process.value += 1
-            except:
-                with lock:
-                    num_process.value -= 1
+            pool.apply_async(main, args=(args, num_process, lock))
+            with lock:
+                num_process.value += 1
