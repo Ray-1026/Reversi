@@ -320,7 +320,7 @@ def main():
                     
                     # receive match request
                     if opponent != -1:
-                        stop_sending_trash(s)
+                        stop_sending_trash()
                         req_text = small_font.render(f'{opponent} want to play with you!', True, white)
                         req_rect = req_text.get_rect(center=(220, 50))
                         screen.blit(req_text, req_rect)

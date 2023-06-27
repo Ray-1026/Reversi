@@ -39,6 +39,7 @@ def send_opponent(s, user_name, opponent):
 
 def passive_recv_req(s):
     data = s.recv(8192).decode('utf-8')
+    print("req", data)
     return data[4:] if data.startswith('req') else -1
 
 

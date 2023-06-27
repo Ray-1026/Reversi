@@ -127,7 +127,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     client_name_dict[opponent_dict[name]].sendall(packing(["play", content[2], content[3]]))
                     
                 elif content[0] == 'no_event':
-                    sock.sendall('fuck_you'.encode())
+                    pass
+                    #sock.sendall('fuck_you'.encode())
                 
                 elif content[0] == 'END1':
                     name = content[1]
