@@ -83,8 +83,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         
                         del client_name_dict[name]
                         del client_sock_dict[sock]
+                        continue
                     except:
-                        pass
+                        continue
 
                 content = content.split('#')
                 if content != [""] and content != ['no_event'] and content != ['online_list']: print(content)
