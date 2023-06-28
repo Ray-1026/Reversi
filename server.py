@@ -107,19 +107,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     # disconnect while running game
                     sock.close()
                     socket_list.remove(sock)
-                    try:
-                        name = client_sock_dict[sock]
-                        if name in passive_list:
-                            passive_list.remove(name)
+                    name = client_sock_dict[sock]
+                    if name in passive_list:
+                        passive_list.remove(name)
 
-                        if name in opponent_dict:
-                            client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
-                            del opponent_dict[name]
-                        
-                        del client_name_dict[name]
-                        del client_sock_dict[sock]
-                    except:
-                        pass
+                    if name in opponent_dict:
+                        client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
+                        del opponent_dict[name]
+                    
+                    del client_name_dict[name]
+                    del client_sock_dict[sock]
                                 
                 elif content[0] == 'register':
                     client_name = content[1]
