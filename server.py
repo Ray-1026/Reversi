@@ -133,6 +133,30 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 elif content[0] == 'register':
                     client_name = content[1]
                     client_mode = content[2]
+                    for name in client_name_dict:
+                        if is_socket_closed(client_name_dict[name]):                        
+                            if name in passive_list:
+                                passive_list.remove(name)
+
+                            if name in opponent_dict:
+                                opponent = opponent_dict[name]
+                                match = (max(name, opponent), min(name, opponent))
+                                if match in match_result:
+                                    del match_result[match]
+                                if match in match_cnt:
+                                    del match_cnt[match]
+                                if match in match_order_recv_cnt:
+                                    del match_order_recv_cnt[match]
+                                if match in match_end_cnt:
+                                    del match_end_cnt[match]
+                                try:
+                                    client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
+                                except:
+                                    print("[ERROR] Send Error")
+                                del opponent_dict[opponent_dict[name]]
+                                del opponent_dict[name]
+                            
+                            del client_name_dict[name]
                     if client_name in client_name_dict:
                         print('Name already exists')
                         try:
