@@ -86,7 +86,7 @@ class GameLogic:
                     """
                     # Q5 begin
                     "?"(self.board.board, self.cur_agent.side, pos[0], pos[1])
-                    self.lastMove = "?"
+                    self.last_move = "?"
                     # Q5 end
 
                 # 判斷下回合是否要交換玩家
