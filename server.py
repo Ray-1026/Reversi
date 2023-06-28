@@ -166,6 +166,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         sock.sendall('success_send_agree'.encode())
                     else:
                         sock.sendall('opponent_disconnected'.encode())
+                    match_order_recv_cnt[match] = 0
                         
                 elif content[0] == 'game_order':
                     first_game = True if content[1] == 'first' else False
