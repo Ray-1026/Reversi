@@ -161,6 +161,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 elif content[0] == 'passive_confirm':
                     passive_player = content[1]
                     opponent = content[2]
+                    match = (max(passive_player, opponent), min(passive_player, opponent))
                     if opponent in client_name_dict:
                         client_name_dict[opponent].sendall('agree'.encode())
                         sock.sendall('success_send_agree'.encode())
