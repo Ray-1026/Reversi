@@ -112,11 +112,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         passive_list.remove(name)
 
                     if name in opponent_dict:
-                        client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
+                        if opponent_dict[name] in client_name_dict:
+                            client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
                         del opponent_dict[name]
-                    
-                    del client_name_dict[name]
-                    del client_sock_dict[sock]
+                    if name in client_name_dict:
+                        del client_name_dict[name]
+                    if sock in client_sock_dict:
+                        del client_sock_dict[sock]
                                 
                 elif content[0] == 'register':
                     client_name = content[1]
