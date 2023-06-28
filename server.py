@@ -114,19 +114,22 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     # disconnect while running game
                     sock.close()
                     socket_list.remove(sock)
-                    name = client_sock_dict[sock]
-                    if name in passive_list:
-                        passive_list.remove(name)
+                    try:
+                        name = client_sock_dict[sock]
+                        if name in passive_list:
+                            passive_list.remove(name)
 
-                    if name in opponent_dict:
-                        if opponent_dict[name] in client_name_dict:
-                            try:
-                                client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
-                            except:
-                                print("[ERROR] Send Error")
-                        del opponent_dict[name]
-                    if name in client_name_dict:
-                        del client_name_dict[name]
+                        if name in opponent_dict:
+                            if opponent_dict[name] in client_name_dict:
+                                try:
+                                    client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
+                                except:
+                                    print("[ERROR] Send Error")
+                            del opponent_dict[name]
+                        if name in client_name_dict:
+                            del client_name_dict[name]
+                    except:
+                        pass
                     if sock in client_sock_dict:
                         del client_sock_dict[sock]
                                 
