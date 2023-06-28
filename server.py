@@ -133,7 +133,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 elif content[0] == 'register':
                     client_name = content[1]
                     client_mode = content[2]
-                    for name in client_name_dict:
+                    name_list = list(client_name_dict.keys())
+                    for name in name_list:
                         if is_socket_closed(client_name_dict[name]):                        
                             if name in passive_list:
                                 passive_list.remove(name)
