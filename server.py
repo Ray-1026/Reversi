@@ -21,6 +21,7 @@ opponent_dict = {} # key: name, value: opponent name
 match_result = {} # key: (name1, name2), value: result
 match_cnt = defaultdict(def_value)
 match_order_recv_cnt = defaultdict(def_value)
+match_end_cnt = defaultdict(def_value)
 
 
 # def sending_trash(conn):
@@ -197,14 +198,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         match_order_recv_cnt[match] = 0
                 elif content[0] == 'END2':
                     name = content[1]
-                    if name == match[0]:
-                        opponent = opponent_dict[name]
-                        match = (max(name, opponent), min(name, opponent))
+                    opponent = opponent_dict[name]
+                    match = (max(name, opponent), min(name, opponent))
+                    if match_end_cnt[match] == 0:
                         match_result[match][name] += int(content[2])
                         match_result[match][opponent] += int(content[3])
+                        match_end_cnt[match] += 1
+                    elif match_end_cnt[match] == 1:
                         sock.sendall(pickle.dumps(match_result[match]))
                         client_name_dict[opponent].sendall(pickle.dumps(match_result[match]))
-                        match_order_recv_cnt[match] = 0
+                        match_end_cnt[match] = 0
                         match_cnt[match] = 0
                 elif content[0] == 'get_order':
                     name = content[1]
