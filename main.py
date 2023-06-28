@@ -12,6 +12,19 @@ from remote_agent import RemoteAgent
 from client import *
 
 def main():
+
+    """
+    # 玩家設定
+    目前支援的 Agent 有:
+    - Agent: 最簡單的 Agent，選擇可以翻最多棋的位置下棋
+    - MinimaxAgent: 使用 Minimax 演算法的 Agent
+    - PlayerAgent: 玩家自己下棋
+    """
+    PVCAgent = MinimaxAgent  # 玩家對電腦的 Agent
+    CVCAgent1 = MinimaxAgent # 電腦對電腦的第一個 agent，下黑棋
+    CVCAgent2 = Agent        # 電腦對電腦的第二個 agent，下白棋
+    PVPAgent = PlayerAgent   # 線上模式的 Agent
+
     """
     # Pygame 啟動 !!!
     """
@@ -29,14 +42,6 @@ def main():
     move_window = 0
     move_window = 0
 
-    # 玩家設定
-
-    PVCAgent = MinimaxAgent
-    CVCAgent1 = MinimaxAgent # black
-    CVCAgent2 = Agent        # white
-    PVPAgent = PlayerAgent
-
-    
     color = (255, 255, 255)
     chooseSide = "black"
     status = "start"

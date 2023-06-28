@@ -26,7 +26,7 @@ class MinimaxAgent:
         if maximized:
             val = float("-inf")
             move = None
-            for x, y in utils.getValidMoves(board, self.side):
+            for x, y in utils.getValidMoves(board, self.side): # x, y 是下棋位置的座標
                 copyBoard = utils.getBoardCopy(board)
                 utils.flip(copyBoard, self.side, x, y)
                 child_score, _ = self.minimax(copyBoard, depth-1, False)
@@ -39,7 +39,7 @@ class MinimaxAgent:
         else:
             val = float("inf")
             move = None
-            for x, y in utils.getValidMoves(board, self.opponentSide):
+            for x, y in utils.getValidMoves(board, self.opponentSide): # x, y 是下棋位置的座標
                 copyBoard = utils.getBoardCopy(board)
                 utils.flip(copyBoard, self.opponentSide, x, y)
                 child_score, _ = self.minimax(copyBoard, depth-1, True)           
