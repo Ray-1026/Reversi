@@ -65,7 +65,27 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 conn, addr = s.accept()
                 socket_list.append(conn) 
             else:
-                content = sock.recv(MSG_SIZE).decode('utf-8')
+                try:
+                    content = sock.recv(MSG_SIZE).decode('utf-8')
+                except:
+                    print('client disconnected')
+                    sock.close()
+                    socket_list.remove(sock)
+                    try:
+                        name = client_sock_dict[sock]
+                        if name in passive_list:
+                            passive_list.remove(name)
+
+                        if name in opponent_dict:
+                            client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
+                            del opponent_dict[opponent_dict[name]]
+                            del opponent_dict[name]
+                        
+                        del client_name_dict[name]
+                        del client_sock_dict[sock]
+                    except:
+                        pass
+
                 content = content.split('#')
                 if content != [""] and content != ['no_event'] and content != ['online_list']: print(content)
                 if content[0] == 'running_disconnect':
@@ -83,17 +103,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     # disconnect while running game
                     sock.close()
                     socket_list.remove(sock)
-                    name = client_sock_dict[sock]
-                    if name in passive_list:
-                        passive_list.remove(name)
+                    try:
+                        name = client_sock_dict[sock]
+                        if name in passive_list:
+                            passive_list.remove(name)
 
-                    if name in opponent_dict:
-                        client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
-                        del opponent_dict[opponent_dict[name]]
-                        del opponent_dict[name]
-                    
-                    del client_name_dict[name]
-                    del client_sock_dict[sock]
+                        if name in opponent_dict:
+                            client_name_dict[opponent_dict[name]].sendall('opponent_disconnected'.encode())
+                            del opponent_dict[opponent_dict[name]]
+                            del opponent_dict[name]
+                        
+                        del client_name_dict[name]
+                        del client_sock_dict[sock]
+                    except:
+                        pass
                                 
                 elif content[0] == 'register':
                     client_name = content[1]
