@@ -60,7 +60,7 @@ def getValidMoves(board, side):
                     1. isOnBoard -> 可判斷輸入的x、y值的位置是否在棋盤上
                     2. isValidMove -> 判斷黑或白棋能否下在棋盤的(x, y)處
             """
-            if "?":
+            if isValidMove(board, side, x, y):
                 valid.append([x, y])
     return valid
 
@@ -123,7 +123,9 @@ def getFlipDisks(board, side, xstart, ystart):
                 2. x和y繼續分別往xdirect和ydirect找
                 """
                 # Q2 begin your code here
-                pass
+                temp.append([x, y])
+                x += xdirect
+                y += ydirect
                 # Q2 end your code
 
             elif board[x][y] == side:  # 如果找到的棋子顏色是我方的，停止往下找
@@ -159,7 +161,7 @@ def flip(board, side, xstart, ystart):
             4. getScore -> 計算棋盤上黑棋和白棋的數量
             5. getFlipDisk -> 找到哪些棋子會被翻轉
     """
-    disks = "?"
+    disks = getFlipDisks(board, side, xstart, ystart)
     board[xstart][ystart] = side  # 在(xstart, ystart)的地方下棋
 
     # 翻轉棋子顏色

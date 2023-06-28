@@ -58,7 +58,7 @@ class GameLogic:
                 3. utils.noMoreMove
                 4. utils.getScore
         """
-        while not "?"(self.board.board):  # 當還有位置下
+        while not utils.noMoreMove(self.board.board):  # 當還有位置下
             pos = None  # 下棋的位置
 
             # 事件監聽
@@ -85,8 +85,8 @@ class GameLogic:
                     2. last_move等於目前最後下棋的地方
                     """
                     # Q5 begin
-                    "?"(self.board.board, self.cur_agent.side, pos[0], pos[1])
-                    self.last_move = "?"
+                    utils.flip(self.board.board, self.cur_agent.side, pos[0], pos[1])
+                    self.last_move = pos
                     # Q5 end
 
                 # 判斷下回合是否要交換玩家
