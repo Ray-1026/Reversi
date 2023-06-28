@@ -84,7 +84,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         del client_name_dict[name]
                         del client_sock_dict[sock]
                         continue
-                    except:
+                    # print exceptions
+                    except Exception as e:
+                        print(e)
                         continue
 
                 content = content.split('#')
