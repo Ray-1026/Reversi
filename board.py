@@ -89,10 +89,10 @@ class Board:
                 self.board[x][y] = "none"
 
         # 在棋盤中間放上黑白各兩子
-        self.board[3][3] = "white"
-        self.board[3][4] = "black"
-        self.board[4][3] = "black"
-        self.board[4][4] = "white"
+        self.board[3][3] = "black"
+        self.board[3][4] = "white"
+        self.board[4][3] = "white"
+        self.board[4][4] = "black"
 
     def draw(self, screen, status, game=None, user_name=None, results=None):
         """
@@ -164,34 +164,3 @@ class Board:
             text2 = font.render(message, True, self.white)
             screen.blit(text1, text1.get_rect(center=(220, 120)))
             screen.blit(text2, text2.get_rect(center=(220, 200)))
-        
-        elif status == "end pvp":
-            # 計算結果
-            score = utils.getScore(game.board.board)
-            names = list(results.keys())
-            opponent = names[0] if names[0] != user_name else names[1]
-            result = f"{user_name}  {results[user_name]}"
-            result2 = f"{opponent}  {results[opponent]}"
-            # result = "Black  " + str(score["black"]) + "   :   " + str(score["white"]) + "  White"
-
-            # 判斷黑白的輸贏
-            if results[user_name] > results[opponent]:
-                winner = user_name
-            elif results[user_name] < results[opponent]:
-                winner = opponent
-            else:
-                winner = "tie"
-
-            if winner != "tie":
-                message = str(winner) + " Win"
-            else:
-                message = "Tie"
-
-            # 印出結果的文字在遊戲畫面上
-            font = pygame.font.SysFont("Arial", 35)
-            text1 = font.render(result, True, self.white)
-            text_result2 = font.render(result2, True, self.white)
-            text2 = font.render(message, True, self.white)
-            screen.blit(text1, text1.get_rect(center=(220, 115)))
-            screen.blit(text_result2, text_result2.get_rect(center=(220, 155)))
-            screen.blit(text2, text2.get_rect(center=(220, 230)))
