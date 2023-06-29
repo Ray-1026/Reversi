@@ -64,6 +64,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         connections, _, _ = select.select(socket_list, [], [])
         for sock in connections:
             if sock is s:
+                if len(socket_list) > 195:
+                    print("Too many connections")
+                    continue
                 conn, addr = s.accept()
                 socket_list.append(conn) 
             else:
