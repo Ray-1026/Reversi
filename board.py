@@ -84,9 +84,16 @@ class Board:
         --------------------------------------------------------
         """
         # 重製8*8的所有位置
-        for x in range(8):
-            for y in range(8):
-                self.board[x][y] = "none"
+        """
+        Q4. 巢狀迴圈
+        Todo : 為了重製8*8棋盤的所有位置，所以使用巢狀迴圈將self.board中的所有值等於"none"
+        Hint : 
+        1. 3行程式碼
+        2. self.board是一個8*8的二維串列
+        """
+        # Q4 begin your code here
+
+        # Q4 end your code
 
         # 在棋盤中間放上黑白各兩子
         self.board[3][3] = "black"
@@ -94,7 +101,7 @@ class Board:
         self.board[4][3] = "white"
         self.board[4][4] = "black"
 
-    def draw(self, screen, status, game=None, user_name=None, results=None):
+    def draw(self, screen, status, game=None):
         """
         --------------------------------------------------------
         #### 功能 : 繪製遊戲畫面，包括開始、棋盤、結束畫面

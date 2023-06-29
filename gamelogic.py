@@ -6,7 +6,7 @@ from board import Board
 
 
 class GameLogic:
-    def __init__(self, agent1, agent2, screen, sock=None, username=None):
+    def __init__(self, agent1, agent2, screen):
         """
         --------------------------------------------------------
         #### 物件 : 遊戲邏輯
@@ -50,7 +50,7 @@ class GameLogic:
         """
         self.cur_agent = self.agent1 if self.agent1.side == "black" else self.agent2  # 紀錄目前輪到哪個玩家
         """
-        Q4. 將下面的"?"替換成utils.py中的某個function
+        Q6. 將下面的"?"替換成utils.py中的某個function
         Todo : 判斷雙方是否還有棋可以下
         Hint : 替換成以下某個選項
                 1. utils.isOnBoard
@@ -76,7 +76,7 @@ class GameLogic:
             if pos:
                 if utils.isValidMove(self.board.board, self.cur_agent.side, pos[0], pos[1]):  # 如果pos的位置可以下
                     """
-                    Q5. 將底下的"?"改成正確答案
+                    Q7. 將底下的"?"改成正確答案
                     Todo :
                     1. 翻轉棋子
                     2. 更新self.last_move
@@ -84,10 +84,10 @@ class GameLogic:
                     1. 使用某個utils.py中的function (這邊function的名字前記得要加utils.)
                     2. last_move等於目前最後下棋的地方
                     """
-                    # Q5 begin
+                    # Q7 begin
                     "?"(self.board.board, self.cur_agent.side, pos[0], pos[1])
                     self.last_move = "?"
-                    # Q5 end
+                    # Q7 end
 
                 # 判斷下回合是否要交換玩家
                 if utils.getValidMoves(self.board.board, self.cur_agent.opponentSide):
