@@ -23,7 +23,7 @@ def main():
     PVCAgent = MinimaxAgent  # 玩家對電腦的 Agent
     CVCAgent1 = MinimaxAgent # 電腦對電腦的第一個 agent，下黑棋
     CVCAgent2 = Agent        # 電腦對電腦的第二個 agent，下白棋
-    PVPAgent = PlayerAgent   # 線上模式的 Agent
+    PVPAgent = Agent   # 線上模式的 Agent
 
     """
     # Pygame 啟動 !!!
