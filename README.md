@@ -2,8 +2,5 @@
 
 ### Usage
 ```
-pip install pygame
-git clone https://github.com/Ray-1026/Reversi.git
-cd Reversi
-python main.py
+git clone -b simple-blank https://github.com/Ray-1026/Reversi.git
 ```
