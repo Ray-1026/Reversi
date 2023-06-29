@@ -1,6 +1,7 @@
 import random
 import utils
 
+
 class Agent:
     def __init__(self, side):
         """
@@ -78,11 +79,25 @@ class Agent:
                 return [x, y]
 
             # 下在(x, y)的位置，並選擇分數最高的
-            copyBoard = utils.getBoardCopy(board) 
+            copyBoard = utils.getBoardCopy(board)
             utils.flip(copyBoard, self.opponentSide, x, y)
+            """
+            Q5. 完成以下的程式碼
+            Todo : 得到目前的score，若score比bestScore大，更新bestMove和bestScore，最終我們可以得到最高的score
+            Hint :
+            1. "?"替換成utils.py中的某個可以計算黑白棋分數的函式(ABC選項其中一個)
+                A. utils.noMoreMove
+                B. utils.getBoardCopy
+                C. utils.getScore
+            2. if條件式判斷score是否比bestScore大
+            3. 如果條件成立，bestMove = [x, y]，那麼bestScore應該等於什麼?
+            """
+            # Q5 begin your code here
             score = utils.getScore(copyBoard)[self.opponentSide]
+            ## if條件式(共3行)
             if score > bestScore:
                 bestMove = [x, y]
                 bestScore = score
+            # Q5 end your code
 
         return bestMove
