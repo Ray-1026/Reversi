@@ -282,7 +282,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         match_cnt[match] = 0
                 elif content[0] == 'get_order':
                     name = content[1]
-                    opponent = opponent_dict[name]
+                    if name in opponent_dict:
+                        opponent = opponent_dict[name]
+                    else:
+                        try:
+                            sock.sendall('opponent_disconnected'.encode())
+                        except:
+                            print("[ERROR] Send Error")
+                        continue
                     match = (max(name, opponent), min(name, opponent))
                     match_order_recv_cnt[match] += 1
                     if match_order_recv_cnt[match] == 2:
