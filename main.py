@@ -278,6 +278,13 @@ def main():
                                 # if mode == 'passive':
                                 #     start_sending_trash(s)
                                 screen.fill(black)
+                                collide_block = None
+                                if passive:
+                                    waiting_text = large_font.render('Waiting for opponent...', True, white)
+                                    waiting_rect = waiting_text.get_rect(center=(220, 220))
+                                    screen.blit(waiting_text, waiting_rect)
+                                    pygame.display.update()
+                                    main_clock.tick(60)
                                 name_exist = False
                                 break
                             elif name_fg == 'Name already exists':
@@ -311,10 +318,10 @@ def main():
                     screen.blit(name, (name_input_box.x+5, name_input_box.y+5))
                     
             elif sub_status == 'online list':
-                online_list_height = 420 
-                online_list_top = (440 - online_list_height) // 2 
+                online_list_top = 10
                 row_distance = 10
                 ol_block_size = 20+row_distance
+
                 if passive:
                     # render waiting
                     waiting_text = large_font.render('Waiting for opponent...', True, white)
@@ -338,6 +345,17 @@ def main():
                             sys.exit()
                 else: 
                     # render online list
+                    screen.fill(black)
+                    online_list = request_online_list(s)
+                    if online_list != -1:
+                        for idx, name in enumerate(online_list):
+                            user_text = small_font.render(name, True, white)
+                            user_rect = user_text.get_rect(center=(
+                                220, ol_block_size*(idx+1) + online_list_top + move_window))
+                            if collide_block and collide_block == name:
+                                pygame.draw.rect(screen, green, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 2)
+                            screen.blit(user_text, user_rect)
+
                     for event in pygame.event.get():
                         x, y = pygame.mouse.get_pos()
                         screen.fill(black)
@@ -347,7 +365,6 @@ def main():
                             sys.exit()
                             
                         # get online list
-                        online_list = request_online_list(s)
                         if online_list != -1:
                             for idx, name in enumerate(online_list):
                                 user_text = small_font.render(name, True, white)
@@ -355,15 +372,16 @@ def main():
                                     220, ol_block_size*(idx+1) + online_list_top + move_window))
                         
                                 if user_rect.collidepoint((x, y)):
+                                    collide_block = name
                                     pygame.draw.rect(screen, green, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 2)
-                                else:
-                                    pygame.draw.rect(screen, black, (user_rect.left, user_rect.top, user_rect.width, user_rect.height), 0)
+                                elif collide_block == name:
+                                    collide_block = None
                                     
                                 # send match request to choosen opponent
                                 if event.type == pygame.MOUSEBUTTONDOWN:
-                                    if event.button == 4:
+                                    if event.button == 5:
                                         move_window -= 10 
-                                    elif event.button == 5:
+                                    elif event.button == 4:
                                         move_window += 10
                                         
                                     if event.button == 1 and user_rect.collidepoint((x, y)) :
@@ -371,6 +389,11 @@ def main():
                                         send_opponent(s, user_name, name)
                                         # start_sending_trash(s)
                                         screen.fill(black)
+                                        waiting_text = large_font.render('Waiting for opponent...', True, white)
+                                        waiting_rect = waiting_text.get_rect(center=(220, 220))
+                                        screen.blit(waiting_text, waiting_rect)
+                                        pygame.display.update()
+                                        main_clock.tick(60)
                                         break
                                     
                                 screen.blit(user_text, user_rect)
