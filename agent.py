@@ -93,7 +93,7 @@ class Agent:
             3. 如果條件成立，bestMove = [x, y]，那麼bestScore應該等於什麼?
             """
             # Q5 begin your code here
-            score = "?"(copyBoard)[self.opponentSide]
+            score = "__fill_in__"(copyBoard)[self.opponentSide]
             ## if條件式(共3行)
 
             # Q5 end your code
