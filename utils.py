@@ -119,7 +119,7 @@ def getFlipDisks(board, side, xstart, ystart):
                 Q2. 將底下的pass改成正確答案
                 Todo : 如果找到的棋子顏色是對方的，把棋子的位置存下來並繼續往下找
                 Hint :
-                1. 將x和y用陣列的形式儲存在temp陣列中
+                1. 將x和y以[x, y]儲存在temp陣列中
                 2. x和y繼續分別往xdirect和ydirect找
                 """
                 # Q2 begin your code here
