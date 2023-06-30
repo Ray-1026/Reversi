@@ -54,7 +54,7 @@ def getValidMoves(board, side):
     for x in range(8):
         for y in range(8):
             """
-            Q1. 將以下判斷式中的"?"替換成某個function
+            Q1. 將以下判斷式中的"__fill_in__"替換成某個function
             Todo : 判斷(x, y)的位置是否可以下
             Hint : 使用前面提過的函式
                     1. isOnBoard -> 可判斷輸入的x、y值的位置是否在棋盤上
@@ -150,7 +150,7 @@ def flip(board, side, xstart, ystart):
     """
     # 程式碼開始處
     """
-    Q3. 將下面的"?"替換成某個function
+    Q3. 將下面的"__fill_in__"替換成某個function
     Todo : 取得要被翻轉的棋子
     Hint : 使用前面提到過的函式
             1. isOnBoard -> 可判斷輸入的x、y值的位置是否在棋盤上

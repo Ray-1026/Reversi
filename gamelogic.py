@@ -50,7 +50,7 @@ class GameLogic:
         """
         self.cur_agent = self.agent1 if self.agent1.side == "black" else self.agent2  # 紀錄目前輪到哪個玩家
         """
-        Q6. 將下面的"?"替換成utils.py中的某個function
+        Q6. 將下面的"__fill_in__"替換成utils.py中的某個function
         Todo : 判斷雙方是否還有棋可以下
         Hint : 替換成以下某個選項
                 1. utils.isOnBoard
@@ -76,7 +76,7 @@ class GameLogic:
             if pos:
                 if utils.isValidMove(self.board.board, self.cur_agent.side, pos[0], pos[1]):  # 如果pos的位置可以下
                     """
-                    Q7. 將底下的"?"改成正確答案
+                    Q7. 將底下的"__fill_in__"改成正確答案
                     Todo :
                     1. 翻轉棋子
                     2. 更新self.last_move

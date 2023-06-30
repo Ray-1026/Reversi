@@ -85,7 +85,7 @@ class Agent:
             Q5. 完成以下的程式碼
             Todo : 得到目前的score，若score比bestScore大，更新bestMove和bestScore，最終我們可以得到最高的score
             Hint :
-            1. "?"替換成utils.py中的某個可以計算黑白棋分數的函式(ABC選項其中一個)
+            1. "__fill_in__"替換成utils.py中的某個可以計算黑白棋分數的函式(ABC選項其中一個)
                 A. utils.noMoreMove
                 B. utils.getBoardCopy
                 C. utils.getScore
