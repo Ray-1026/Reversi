@@ -41,7 +41,7 @@ def send_opponent(s, user_name, opponent):
 
 def passive_recv_req(s):
     data = s.recv(8192).decode('utf-8')
-    print("req", data)
+    # print("req", data)
     return data[4:] if data.startswith('req') else -1
 
 
@@ -53,18 +53,18 @@ def passive_send_ok(s, name, opponent):
     content = packing(['passive_confirm', name, opponent])
     s.sendall(content)
     data = s.recv(1024).decode('utf-8')
-    print(data)
+    # print(data)
     return data
     
     
 def get_game_order(s, first_game, passive):
-    print("call get_game_order", first_game, passive)
+    # print("call get_game_order", first_game, passive)
     game_cnt = 'first' if first_game else 'second'
     mode = 'passive' if passive else 'active'
     content = packing(['game_order', game_cnt, mode])
     s.sendall(content)
     data = s.recv(1024).decode('utf-8')
-    print(data, "receive")
+    # print(data, "receive")
     if 'white' == data or 'black' == data:
         return data
     else:

@@ -400,7 +400,7 @@ def main():
                 waiting_text = large_font.render("Waiting for opponent...", True, white)
                 waiting_rect = waiting_text.get_rect(center=(220, 220))
                 screen.blit(waiting_text, waiting_rect)
-                print("active waiting")
+                # ("active waiting")
                 fg = active_req_ok(s)
                 if "agree" in fg:
                     sub_status = "setup pvp game"
@@ -480,7 +480,7 @@ def main():
                         sys.exit()
 
                     game_order = get_game_order(s, True, passive)
-                    print("game order", game_order)
+                    # print("game order", game_order)
                     setup_text = large_font.render("Loading...", True, white)
                     setup_rect = setup_text.get_rect(center=(220, 220))
 
@@ -489,7 +489,7 @@ def main():
                         while True:
                             s.sendall(packing(["get_order", user_name]))
                             data = s.recv(1024).decode("utf-8")
-                            print("start game 1", data)
+                            # print("start game 1", data)
                             if data == "OK":
                                 status = "PVP run 1"
                                 screen.fill(black)
@@ -502,7 +502,7 @@ def main():
                     disconnect(s)
                     pygame.quit()
                     sys.exit()
-            print("start pvp run 1", game_order)
+            # print("start pvp run 1", game_order)
             # s.sendall(packing(["OK", user_name]))
             agent1 = PVPAgent(game_order)
             agent2 = RemoteAgent("white" if game_order == "black" else "black")
@@ -517,7 +517,7 @@ def main():
                 status = "PVP end run 1"
 
         elif status == "PVP end run 1":
-            print("end pvp run 1")
+            # print("end pvp run 1")
             if game_order != -1:
                 score = utils.getScore(game.board.board)
                 s.sendall(packing(["END1", user_name, str(score[game_order]), str(score["white" if game_order == "black" else "black"])]))
@@ -527,10 +527,10 @@ def main():
                     print("end1 error")
             game_order = get_game_order(s, False, passive)
             if game_order != -1:
-                print(game_order, "game_order")
+                # print(game_order, "game_order")
                 s.sendall(packing(["get_order", user_name]))
                 data = s.recv(1024).decode("utf-8")
-                print("start game 2", data)
+                # print("start game 2", data)
                 if "OK" in data:
                     status = "PVP run 2"
                     screen.fill(black)
