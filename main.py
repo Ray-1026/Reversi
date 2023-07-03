@@ -38,11 +38,11 @@ def main():
     text_quit = small_font.render("Quit", True, white)
 
     # 按鈕位置設定
-    button_start = text_start.get_rect(center=(335, 150))
-    button_PVC = text_PVC.get_rect(center=(280, 60))
-    button_CVC = text_CVC.get_rect(center=(390, 60))
-    button_black = text_black.get_rect(center=(250, 100))
-    button_white = text_white.get_rect(center=(310, 100))
+    button_start = text_start.get_rect(center=(105, 250))
+    button_PVC = text_PVC.get_rect(center=(55, 160))
+    button_CVC = text_CVC.get_rect(center=(155, 160))
+    button_black = text_black.get_rect(center=(25, 200))
+    button_white = text_white.get_rect(center=(85, 200))
     button_restart = text_restart.get_rect(center=(130, 300))
     button_quit = text_quit.get_rect(center=(310, 300))
 
@@ -64,7 +64,7 @@ def main():
                 x, y = pygame.mouse.get_pos()
 
                 # 判斷滑鼠是否移動到按鈕上
-                if 300 <= x and x <= 375 and 125 <= y and y <= 175:
+                if 70 <= x and x <= 145 and 230 <= y and y <= 270:
                     at_start = True
                 else:
                     at_start = False
@@ -73,7 +73,7 @@ def main():
                     pygame.quit()
                     sys.exit()
                 elif event.type == MOUSEBUTTONDOWN:
-                    if 300 <= x and x <= 375 and 125 <= y and y <= 175:  # 按下start鍵
+                    if 70 <= x and x <= 145 and 230 <= y and y <= 270:  # 按下start鍵
                         at_start = False
                         status = "run"
                         if pvc:  # 選擇PVC模式
@@ -84,37 +84,37 @@ def main():
                             agent2 = Agent("black")  # 2號電腦
                         game = GameLogic(agent1, agent2, screen)
                         pygame.time.delay(750)
-                    elif 240 <= x and x <= 320 and 40 <= y and y <= 80:  # 按下PVC模式
+                    elif 15 <= x and x <= 95 and 140 <= y and y <= 180:  # 按下PVC模式
                         pvc = True
-                    elif 350 <= x and x <= 430 and 40 <= y and y <= 80:  # 按下CVC模式
+                    elif 115 <= x and x <= 195 and 140 <= y and y <= 180:  # 按下CVC模式
                         pvc = False
-                    elif pvc and 225 <= x and x <= 275 and 85 <= y and y <= 115:  # 在PVC模式下選擇黑棋
+                    elif pvc and 0 <= x and x <= 50 and 185 <= y and y <= 215:  # 在PVC模式下選擇黑棋
                         chooseSide = "black"
-                    elif pvc and 285 <= x and x <= 335 and 85 <= y and y <= 115:  # 在PVC模式下選擇白棋
+                    elif pvc and 60 <= x and x <= 110 and 185 <= y and y <= 215:  # 在PVC模式下選擇白棋
                         chooseSide = "white"
 
             board.draw(screen, status)
             if status == "start":
                 if at_start:
-                    pygame.draw.rect(screen, red, (300, 125, 75, 50), 0)
+                    pygame.draw.rect(screen, red, (70, 230, 75, 40), 0)
                 else:
-                    pygame.draw.rect(screen, red, (300, 125, 75, 50), 2)
+                    pygame.draw.rect(screen, red, (70, 230, 75, 40), 2)
 
                 if pvc:
-                    pygame.draw.rect(screen, green, (240, 40, 80, 40), 2)
-                    pygame.draw.rect(screen, red, (350, 40, 80, 40), 2)
+                    pygame.draw.rect(screen, green, (15, 140, 80, 40), 2)
+                    pygame.draw.rect(screen, red, (115, 140, 80, 40), 2)
                     if chooseSide == "black":
-                        pygame.draw.rect(screen, green, (225, 85, 50, 30), 2)
-                        pygame.draw.rect(screen, red, (285, 85, 50, 30), 2)
+                        pygame.draw.rect(screen, green, (0, 185, 50, 30), 2)
+                        pygame.draw.rect(screen, red, (60, 185, 50, 30), 2)
                     else:
-                        pygame.draw.rect(screen, red, (225, 85, 50, 30), 2)
-                        pygame.draw.rect(screen, green, (285, 85, 50, 30), 2)
+                        pygame.draw.rect(screen, red, (0, 185, 50, 30), 2)
+                        pygame.draw.rect(screen, green, (60, 185, 50, 30), 2)
                     screen.blit(text_black, button_black)
                     screen.blit(text_white, button_white)
 
                 else:
-                    pygame.draw.rect(screen, red, (240, 40, 80, 40), 2)
-                    pygame.draw.rect(screen, green, (350, 40, 80, 40), 2)
+                    pygame.draw.rect(screen, red, (15, 140, 80, 40), 2)
+                    pygame.draw.rect(screen, green, (115, 140, 80, 40), 2)
 
                 screen.blit(text_start, button_start)
                 screen.blit(text_PVC, button_PVC)
