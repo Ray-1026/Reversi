@@ -98,11 +98,11 @@ def main():
                 if at_start:
                     pygame.draw.rect(screen, red, (70, 230, 75, 40), 0)
                 else:
-                    pygame.draw.rect(screen, red, (70, 230, 75, 40), 2)
+                    pygame.draw.rect(screen, red, (70, 230, 75, 40), 3)
 
                 if pvc:
-                    pygame.draw.rect(screen, green, (15, 140, 80, 40), 2)
-                    pygame.draw.rect(screen, red, (115, 140, 80, 40), 2)
+                    pygame.draw.rect(screen, green, (15, 140, 80, 40), 3)
+                    pygame.draw.rect(screen, red, (115, 140, 80, 40), 3)
                     if chooseSide == "black":
                         pygame.draw.rect(screen, green, (0, 185, 50, 30), 2)
                         pygame.draw.rect(screen, red, (60, 185, 50, 30), 2)
@@ -113,8 +113,8 @@ def main():
                     screen.blit(text_white, button_white)
 
                 else:
-                    pygame.draw.rect(screen, red, (15, 140, 80, 40), 2)
-                    pygame.draw.rect(screen, green, (115, 140, 80, 40), 2)
+                    pygame.draw.rect(screen, red, (15, 140, 80, 40), 3)
+                    pygame.draw.rect(screen, green, (115, 140, 80, 40), 3)
 
                 screen.blit(text_start, button_start)
                 screen.blit(text_PVC, button_PVC)
