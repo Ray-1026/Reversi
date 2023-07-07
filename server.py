@@ -205,7 +205,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 elif content[0] == 'active_req':
                     active_player = content[1]
                     opponent = content[2]
-                    passive_list.remove(opponent)
+                    if opponent in passive_list:
+                        passive_list.remove(opponent)
                     opponent_dict[opponent] = active_player
                     opponent_dict[active_player] = opponent
                     try:
