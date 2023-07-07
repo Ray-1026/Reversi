@@ -110,8 +110,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                             print(f'remove match {match}')
                             del match_result[match]
                             break
-                    del opponent_dict[opponent_dict[name]]
-                    del opponent_dict[name]
+                    if opponent_dict[name] in opponent_dict:
+                        del opponent_dict[opponent_dict[name]]
+                    if name in opponent_dict:
+                        del opponent_dict[name]
                     
                 if content[0] == 'disconnect':
                     # disconnect while running game
